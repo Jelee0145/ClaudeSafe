@@ -10,9 +10,14 @@
     <AssemblyName>ClaudeSafe</AssemblyName>
     <RootNamespace>ClaudeSafe</RootNamespace>
     <AssemblyTitle>ClaudeSafe - Claude 安全启动与防封号卫士</AssemblyTitle>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>ClaudeSafe</Authors>
+    <ApplicationIcon>Assets\ClaudeSafe.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\ClaudeSafe.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Using Remove="System.Windows.Forms" />

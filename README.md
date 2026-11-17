@@ -3,14 +3,14 @@
 ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Claude Desktop 安全启动器、本地守门代理与运行期断流熔断助手**（基于 .NET 8 WPF，零第三方运行库依赖）。
 
 > 🌐 **项目主页 (Home)**：https://ccsafe.lyzi.cloud  
-> 📦 **最新版本下载**：[GitHub Releases (v1.0.1)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.1)
+> 📦 **最新版本下载**：[GitHub Releases (v1.0.2)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.2)
 
-## 快速下载 (v1.0.1)
+## 快速下载 (v1.0.2)
 
 | 版本 | 说明 | 下载链接 | SHA256 |
 | --- | --- | --- | --- |
-| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.4 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.1-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-x64-standalone.exe) | `1D55FE4F0B56A3EEE5C8C8DEC9E4F001E12273568FD4809230BB446693B0116C` |
-| **精简框架依赖版** | 轻量压缩包（约 150.3 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.1-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-framework-dependent.zip) | `B1E2FCC16D717DA33059C2E8ED4204C19F65BFEDA4AEB1514238F9C6A05B1FF8` |
+| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.6 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.2-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe) | `D4807E27443B492E112A3924DE99C77390E65E290BEDABB69EC5F3C88EE27332` |
+| **精简框架依赖版** | 轻量压缩包（约 334.6 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.2-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip) | `D1F6146DEA6154BB73BC758180C594BC1F7DFE5525E8BF9F3D687CC2FA64F377` |
 
 ## 核心安全机制
 

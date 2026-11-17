@@ -35,6 +35,7 @@ public partial class MainWindow : Window
     private PreFlightReport? _lastReport;
     private CancellationTokenSource? _checkCts;
     private WinForms.NotifyIcon? _trayIcon;
+    private System.Drawing.Icon? _trayCustomIcon;
     private bool _isExplicitExit;
     private bool _isRestartingAsAdmin;
     private bool _killClaudeOnExit = true;
@@ -133,14 +134,34 @@ public partial class MainWindow : Window
         menu.Items.Add(new WinForms.ToolStripSeparator());
         menu.Items.Add("彻底退出后台守护", null, (_, _) => Dispatcher.BeginInvoke(ExitApplicationCompletely));
 
+        _trayCustomIcon = LoadTrayIcon();
         _trayIcon = new WinForms.NotifyIcon
         {
-            Icon = System.Drawing.SystemIcons.Shield,
+            Icon = _trayCustomIcon ?? System.Drawing.SystemIcons.Shield,
             Text = "ClaudeSafe - 后台安全守护中",
             Visible = true,
             ContextMenuStrip = menu
         };
         _trayIcon.DoubleClick += (_, _) => Dispatcher.BeginInvoke(RestoreAndFocusWindow);
+    }
+
+    private static System.Drawing.Icon? LoadTrayIcon()
+    {
+        try
+        {
+            var streamInfo = Application.GetResourceStream(new Uri("pack://application:,,,/Assets/ClaudeSafe.ico"));
+            if (streamInfo?.Stream != null)
+            {
+                using var stream = streamInfo.Stream;
+                return new System.Drawing.Icon(stream, 32, 32);
+            }
+        }
+        catch
+        {
+            // Fallback to system shield icon if embedded resource cannot be loaded
+        }
+
+        return null;
     }
 
     private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -1062,6 +1083,19 @@ public partial class MainWindow : Window
                 // Ignore tray disposal errors during shutdown
             }
             _trayIcon = null;
+        }
+
+        if (_trayCustomIcon != null)
+        {
+            try
+            {
+                _trayCustomIcon.Dispose();
+            }
+            catch
+            {
+                // Ignore tray icon disposal errors during shutdown
+            }
+            _trayCustomIcon = null;
         }
     }
 

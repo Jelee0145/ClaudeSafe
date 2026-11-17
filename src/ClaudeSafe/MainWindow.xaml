@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:models="clr-namespace:ClaudeSafe.Models"
         Title="ClaudeSafe"
+        Icon="pack://application:,,,/Assets/ClaudeSafe.ico"
         Width="405"
         Height="540"
         WindowStartupLocation="CenterScreen"
