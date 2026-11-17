@@ -1,0 +1,673 @@
+<Window x:Class="ClaudeSafe.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:ClaudeSafe.Models"
+        Title="ClaudeSafe"
+        Width="405"
+        Height="540"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        FontFamily="Microsoft YaHei UI, Segoe UI"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+    <Border Margin="10"
+            CornerRadius="22"
+            Background="#FAF9F5"
+            BorderBrush="#E5E2DC"
+            BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.16" Color="#141413"/>
+        </Border.Effect>
+
+        <Grid>
+            <!-- ==================== 主视图 (3:4 极简核心界面) ==================== -->
+            <Grid x:Name="MainViewGrid" Visibility="Visible">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="44"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 顶部自定义无边框标题栏（支持拖拽） -->
+                <Grid Grid.Row="0"
+                      Background="Transparent"
+                      MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                      Margin="16,8,12,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="TitleDot" Width="8" Height="8" Fill="#D97757" Margin="0,0,7,0"/>
+                        <TextBlock Text="ClaudeSafe" FontSize="12.5" FontWeight="SemiBold" Foreground="#5E5C56"/>
+                        <Button x:Name="BtnAdminMini"
+                                Background="#F0EEE6"
+                                BorderThickness="0"
+                                Padding="7,2"
+                                Margin="8,0,0,0"
+                                Cursor="Hand"
+                                VerticalAlignment="Center"
+                                ToolTip="点击以管理员身份重启，启用 Windows 内核级禁止直连防火墙"
+                                Click="BtnAdminMini_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <TextBlock x:Name="AdminMiniText" Text="标准守护 · 点此开启禁直连" FontSize="10" Foreground="#B45309"/>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Style="{StaticResource TitleBarIconButtonStyle}"
+                                Content="—"
+                                ToolTip="最小化"
+                                Click="BtnMinimize_Click"/>
+                        <Button Style="{StaticResource TitleBarIconButtonStyle}"
+                                Content="✕"
+                                Margin="2,0,0,0"
+                                ToolTip="隐藏到系统托盘后台守护"
+                                Click="BtnHideToTray_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 上半部：Claude 星芒 Logo + 主状态 + 出口 IP 胶囊 -->
+                <StackPanel Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            Margin="20,4,20,10">
+                    <!-- Claude 标志性星芒矢量 Logo（未启动时长按 1 秒旋转解锁 3P 模式） -->
+                    <Border x:Name="ClaudeLogoBorder"
+                            Width="64"
+                            Height="64"
+                            CornerRadius="19"
+                            Background="#FFFFFF"
+                            BorderBrush="#EAE7DF"
+                            BorderThickness="1"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,10"
+                            Cursor="Hand"
+                            RenderTransformOrigin="0.5,0.5"
+                            ToolTip="未启动时：长按 1 秒临时解锁（用于启动 Claude 3P 模式）"
+                            MouseLeftButtonDown="ClaudeLogoBorder_MouseLeftButtonDown"
+                            MouseLeftButtonUp="ClaudeLogoBorder_MouseLeftButtonUp"
+                            LostMouseCapture="ClaudeLogoBorder_LostMouseCapture">
+                        <Border.RenderTransform>
+                            <ScaleTransform x:Name="LogoScaleTransform" ScaleX="1" ScaleY="1"/>
+                        </Border.RenderTransform>
+                        <Grid>
+                            <Canvas Width="62" Height="62" IsHitTestVisible="False">
+                                <Path x:Name="LogoProgressArc"
+                                      Stroke="#D97757"
+                                      StrokeThickness="2.5"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      Visibility="Collapsed"/>
+                            </Canvas>
+                            <Viewbox Width="38" Height="38" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                                <Viewbox.RenderTransform>
+                                    <RotateTransform x:Name="LogoRotateTransform" Angle="0"/>
+                                </Viewbox.RenderTransform>
+                                <Canvas Width="100" Height="100">
+                                    <Path x:Name="ClaudeLogoPath"
+                                          Fill="#D97757"
+                                          Data="M46.8,10 L53.2,10 L52.2,41.5 L72.5,17.2 L77.5,21.4 L55.8,44.4 L87.2,36.2 L88.8,42.4 L57.1,49.1 L85.5,64.8 L82.3,70.4 L54.6,53.4 L67.8,83.4 L61.9,85.9 L50,55.8 L38.1,85.9 L32.2,83.4 L45.4,53.4 L17.7,70.4 L14.5,64.8 L42.9,49.1 L11.2,42.4 L12.8,36.2 L44.2,44.4 L22.5,21.4 L27.5,17.2 L47.8,41.5 Z"/>
+                                </Canvas>
+                            </Viewbox>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock x:Name="MainStatusTitle"
+                               Text="已开启流量封锁 · 待安全启动"
+                               FontSize="17"
+                               FontWeight="Bold"
+                               Foreground="#141413"
+                               HorizontalAlignment="Center"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
+                        <Border x:Name="IpPillBorder"
+                                Background="#F0EEE6"
+                                BorderBrush="#E2DFD5"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="10,3">
+                            <TextBlock x:Name="IpPillText"
+                                       Text="🌐 出口 IP：点击下方按钮开始检测"
+                                       FontSize="11.5"
+                                       Foreground="#5E5C56"/>
+                        </Border>
+                        <Border x:Name="CooldownPill"
+                                Visibility="Collapsed"
+                                Background="#FEF3C7"
+                                BorderBrush="#F59E0B"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="9,3"
+                                Margin="6,0,0,0">
+                            <TextBlock x:Name="CooldownTimerText"
+                                       Text="⏳ 05:00"
+                                       FontSize="11.5"
+                                       FontWeight="Bold"
+                                       Foreground="#B45309"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- 中部：极简 2×3 状态胶囊 + 风险提示卡 -->
+                <Border Grid.Row="2"
+                        Margin="18,4,18,14"
+                        Background="#FFFFFF"
+                        BorderBrush="#EAE7DF"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        Padding="10">
+                    <Grid>
+                        <TextBlock x:Name="EmptyCheckHint"
+                                   Text="点击下方按钮后，将在此显示代理通道、出口合规与防直连状态。"
+                                   FontSize="12"
+                                   Foreground="#8C8980"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="12"/>
+
+                        <Grid x:Name="CheckContentGrid" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 6 项极简 2 列状态胶囊（无滚动条、无截断） -->
+                            <ItemsControl x:Name="RiskItemsList" Grid.Row="0">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type models:CheckItemResult}">
+                                        <Border Padding="9,7"
+                                                Margin="3"
+                                                CornerRadius="9"
+                                                BorderThickness="1">
+                                            <Border.ToolTip>
+                                                <ToolTip>
+                                                    <StackPanel MaxWidth="260">
+                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="11.5"/>
+                                                        <TextBlock Text="{Binding StatusText}" FontSize="11" Margin="0,2,0,0"/>
+                                                        <TextBlock Text="{Binding Detail}" TextWrapping="Wrap" FontSize="10.5" Foreground="#555" Margin="0,4,0,0"/>
+                                                    </StackPanel>
+                                                </ToolTip>
+                                            </Border.ToolTip>
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#FAF9F5"/>
+                                                    <Setter Property="BorderBrush" Value="#ECEAE2"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Safe}">
+                                                            <Setter Property="Background" Value="#F3FAF6"/>
+                                                            <Setter Property="BorderBrush" Value="#D1EBDD"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Warning}">
+                                                            <Setter Property="Background" Value="#FFFBEB"/>
+                                                            <Setter Property="BorderBrush" Value="#FDE68A"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Danger}">
+                                                            <Setter Property="Background" Value="#FEF2F2"/>
+                                                            <Setter Property="BorderBrush" Value="#FECACA"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Ellipse Width="7" Height="7" Margin="0,0,6,0" VerticalAlignment="Center">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="#8C8980"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Safe}">
+                                                                    <Setter Property="Fill" Value="#18794E"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Warning}">
+                                                                    <Setter Property="Fill" Value="#D97706"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Danger}">
+                                                                    <Setter Property="Fill" Value="#C93B2B"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                                <TextBlock Text="{Binding DisplayShortTitle}"
+                                                           FontSize="11"
+                                                           Foreground="#5E5C56"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text=" · "
+                                                           FontSize="11"
+                                                           Foreground="#A3A096"
+                                                           VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding DisplayShortStatus}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#3D3C38"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Safe}">
+                                                                    <Setter Property="Foreground" Value="#18794E"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Warning}">
+                                                                    <Setter Property="Foreground" Value="#B45309"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Danger}">
+                                                                    <Setter Property="Foreground" Value="#C93B2B"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- 无风险时的整洁说明卡 / 有风险时的详细展开卡 -->
+                            <Grid Grid.Row="1" Margin="3,8,3,0">
+                                <Border x:Name="AllSafeSummaryBox"
+                                        Background="#FAF9F5"
+                                        BorderBrush="#ECEAE2"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="10,8"
+                                        VerticalAlignment="Center">
+                                    <TextBlock x:Name="AllSafeSummaryText"
+                                               Text="全部 6 项检测均通过，悬停上方胶囊可查看详情。"
+                                               FontSize="11.5"
+                                               Foreground="#5E5C56"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center"
+                                               LineHeight="17"/>
+                                </Border>
+
+                                <ScrollViewer x:Name="IssueScrollBox"
+                                              Visibility="Collapsed"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl x:Name="IssueItemsList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type models:CheckItemResult}">
+                                                <Border Padding="8,6"
+                                                        Margin="0,0,0,5"
+                                                        CornerRadius="8"
+                                                        BorderThickness="1">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="#FFFBEB"/>
+                                                            <Setter Property="BorderBrush" Value="#FDE68A"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Danger}">
+                                                                    <Setter Property="Background" Value="#FEF2F2"/>
+                                                                    <Setter Property="BorderBrush" Value="#FECACA"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <StackPanel>
+                                                        <TextBlock FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Foreground" Value="#B45309"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding RiskLevel}" Value="{x:Static models:RiskLevel.Danger}">
+                                                                            <Setter Property="Foreground" Value="#C93B2B"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                            <Run Text="{Binding DisplayShortTitle, Mode=OneWay}"/>
+                                                            <Run Text="："/>
+                                                            <Run Text="{Binding StatusText, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                        <TextBlock Text="{Binding Recommendation, Mode=OneWay}"
+                                                                   FontSize="10.5"
+                                                                   Foreground="#5E5C56"
+                                                                   TextWrapping="Wrap"
+                                                                   Margin="0,2,0,0"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- 底部：主操作大按钮 + 冷静期副按钮 + 右下角设置按钮 -->
+                <StackPanel Grid.Row="3" Margin="18,0,18,16">
+                    <Button x:Name="BtnPrimaryAction"
+                            Style="{StaticResource PrimaryClaudeButtonStyle}"
+                            Height="46"
+                            Click="BtnPrimaryAction_Click"
+                            Content="检测网络并安全启动"/>
+
+                    <Button x:Name="BtnSecondaryKill"
+                            Style="{StaticResource DangerClaudeButtonStyle}"
+                            Height="34"
+                            FontSize="12.5"
+                            Margin="0,6,0,0"
+                            Visibility="Collapsed"
+                            Click="BtnSecondaryKill_Click"
+                            Content="封锁并立即退出 Claude"/>
+
+                    <DockPanel Margin="2,10,0,0">
+                        <TextBlock x:Name="FooterHintText"
+                                   Text="🛡️ 后台守护运行中 · 关窗不退出"
+                                   FontSize="11"
+                                   Foreground="#8C8980"
+                                   VerticalAlignment="Center"/>
+                        <Button x:Name="BtnOpenSettings"
+                                Style="{StaticResource SecondaryLightButtonStyle}"
+                                HorizontalAlignment="Right"
+                                Padding="11,5"
+                                FontSize="11.5"
+                                Click="BtnOpenSettings_Click"
+                                Content="⚙ 设置"/>
+                    </DockPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- ==================== 设置视图（整洁分组 · 零滚动条 · 日志默认隐藏） ==================== -->
+            <Grid x:Name="SettingsViewGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 顶部栏 -->
+                <Grid Grid.Row="0"
+                      Background="Transparent"
+                      MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                      Margin="16,10,14,2">
+                    <Button Style="{StaticResource SecondaryLightButtonStyle}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Padding="10,4"
+                            FontSize="11.5"
+                            Click="BtnCloseSettings_Click"
+                            Content="← 返回"/>
+                    <TextBlock Text="设置"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#141413"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                    <Button Style="{StaticResource TitleBarIconButtonStyle}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Content="✕"
+                            ToolTip="隐藏到系统托盘后台守护"
+                            Click="BtnHideToTray_Click"/>
+                </Grid>
+
+                <!-- 主体三张卡片 + 底部退出 -->
+                <Grid Grid.Row="1" Margin="16,4,16,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 卡片 1：安全与启动策略 -->
+                    <Border Grid.Row="0"
+                            Background="#FFFFFF"
+                            BorderBrush="#EAE7DF"
+                            BorderThickness="1"
+                            CornerRadius="14"
+                            Padding="12,10"
+                            Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="安全与守护策略" FontSize="11.5" FontWeight="SemiBold" Foreground="#141413" Margin="0,0,0,7"/>
+
+                            <DockPanel Margin="0,0,0,6">
+                                <CheckBox x:Name="ChkAutoStart"
+                                          Style="{StaticResource LightCheckBoxStyle}"
+                                          FontSize="11.5"
+                                          Checked="ChkAutoStart_Changed"
+                                          Unchecked="ChkAutoStart_Changed"
+                                          Content="开机自启动（静默驻留托盘防裸连）"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,7">
+                                <CheckBox x:Name="ChkBlockUnauthorized"
+                                          Style="{StaticResource LightCheckBoxStyle}"
+                                          FontSize="11.5"
+                                          IsChecked="True"
+                                          Checked="ProtectionOption_Changed"
+                                          Unchecked="ProtectionOption_Changed"
+                                          Content="防误触强杀（拦截直接打开的 Claude）"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,6">
+                                <TextBlock Text="断流熔断冷静期" FontSize="11.5" Foreground="#3D3C38" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="CmbCooldownMinutes"
+                                          Width="96"
+                                          Height="25"
+                                          FontSize="11"
+                                          HorizontalAlignment="Right"
+                                          SelectionChanged="CmbCooldownMinutes_SelectionChanged">
+                                    <ComboBoxItem Tag="60" Content="1 分钟"/>
+                                    <ComboBoxItem Tag="180" Content="3 分钟"/>
+                                    <ComboBoxItem Tag="300" Content="5 分钟" IsSelected="True"/>
+                                    <ComboBoxItem Tag="600" Content="10 分钟"/>
+                                </ComboBox>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <TextBlock x:Name="TxtIpBaselineSummary"
+                                           Text="IP 基线：暂无记录"
+                                           FontSize="11"
+                                           Foreground="#6B6962"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           MaxWidth="230"/>
+                                <Button Style="{StaticResource SecondaryLightButtonStyle}"
+                                        HorizontalAlignment="Right"
+                                        Padding="8,2"
+                                        FontSize="10.5"
+                                        Click="BtnResetIpBaseline_Click"
+                                        Content="重置基线"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 卡片 2：系统防护与代理 -->
+                    <Border Grid.Row="1"
+                            Background="#FFFFFF"
+                            BorderBrush="#EAE7DF"
+                            BorderThickness="1"
+                            CornerRadius="14"
+                            Padding="12,10"
+                            Margin="0,0,0,8">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,7">
+                                <TextBlock Text="系统防护与网络" FontSize="11.5" FontWeight="SemiBold" Foreground="#141413" VerticalAlignment="Center"/>
+                                <Button x:Name="BtnRestartAdmin"
+                                        Style="{StaticResource SecondaryLightButtonStyle}"
+                                        HorizontalAlignment="Right"
+                                        Padding="8,2"
+                                        FontSize="10.5"
+                                        Click="BtnRestartAdmin_Click"
+                                        Content="🛡️ 以管理员运行"/>
+                            </DockPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <CheckBox x:Name="ChkFirewall"
+                                          Style="{StaticResource LightCheckBoxStyle}"
+                                          FontSize="11.5"
+                                          IsChecked="True"
+                                          Margin="0,0,14,0"
+                                          Checked="ProtectionOption_Changed"
+                                          Unchecked="ProtectionOption_Changed"
+                                          Content="防火墙禁止直连"/>
+                                <CheckBox x:Name="ChkHosts"
+                                          Style="{StaticResource LightCheckBoxStyle}"
+                                          FontSize="11.5"
+                                          IsChecked="True"
+                                          Checked="ProtectionOption_Changed"
+                                          Unchecked="ProtectionOption_Changed"
+                                          Content="Hosts 域名黑洞"/>
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,7">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="64"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="68"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TxtProxyHost" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="0" ToolTip="上游代理主机"/>
+                                <TextBox x:Name="TxtProxyPort" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="2" ToolTip="上游代理端口"/>
+                                <TextBox x:Name="TxtGatekeeperPort" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="4" ToolTip="守门代理端口"/>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TxtClaudePath" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="0" ToolTip="Claude Desktop 路径"/>
+                                <Button Grid.Column="2"
+                                        Style="{StaticResource SecondaryLightButtonStyle}"
+                                        Height="27"
+                                        Padding="10,2"
+                                        FontSize="11"
+                                        Click="BtnBrowseClaude_Click"
+                                        Content="浏览"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 卡片 3：工具与隐藏日志入口 -->
+                    <Grid Grid.Row="2" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="6"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="6"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                x:Name="BtnOnlyCheck"
+                                Style="{StaticResource SecondaryLightButtonStyle}"
+                                Padding="4,8"
+                                FontSize="11"
+                                Click="BtnOnlyCheck_Click"
+                                Content="🔍 仅检测网络"/>
+                        <Button Grid.Column="2"
+                                Style="{StaticResource SecondaryLightButtonStyle}"
+                                Padding="4,8"
+                                FontSize="11"
+                                Click="BtnSimulateTrip_Click"
+                                Content="⚡ 模拟断流熔断"/>
+                        <Button Grid.Column="4"
+                                Style="{StaticResource SecondaryLightButtonStyle}"
+                                Padding="4,8"
+                                FontSize="11"
+                                Click="BtnOpenLogOverlay_Click"
+                                Content="📋 运行日志"/>
+                    </Grid>
+
+                    <!-- 底部守护统计与彻底退出 -->
+                    <StackPanel Grid.Row="4">
+                        <TextBlock x:Name="GatekeeperStatsText"
+                                   Text="守门端口 127.0.0.1:17890 [已锁死] · 已拦截 0 次"
+                                   FontSize="10.5"
+                                   Foreground="#8C8980"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,8"/>
+                        <Button Style="{StaticResource DangerClaudeButtonStyle}"
+                                Height="38"
+                                FontSize="13"
+                                Click="BtnExitCompletely_Click"
+                                Content="彻底退出后台守护"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- ==================== 独立隐藏日志抽屉视图 ==================== -->
+            <Grid x:Name="LogOverlayGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0"
+                      Background="Transparent"
+                      MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"
+                      Margin="16,10,14,2">
+                    <Button Style="{StaticResource SecondaryLightButtonStyle}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Padding="10,4"
+                            FontSize="11.5"
+                            Click="BtnCloseLogOverlay_Click"
+                            Content="← 返回设置"/>
+                    <TextBlock Text="运行审计日志"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#141413"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
+                <Border Grid.Row="1"
+                        Margin="16,4,16,10"
+                        Background="#FFFFFF"
+                        BorderBrush="#EAE7DF"
+                        BorderThickness="1"
+                        CornerRadius="14"
+                        Padding="8">
+                    <TextBox x:Name="TxtAuditLog"
+                             IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"
+                             Background="#FAF9F5"
+                             Foreground="#3D3C38"
+                             BorderThickness="0"
+                             FontFamily="Consolas, Microsoft YaHei UI"
+                             FontSize="10.5"
+                             Padding="6"/>
+                </Border>
+
+                <Grid Grid.Row="2" Margin="16,0,16,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Style="{StaticResource SecondaryLightButtonStyle}"
+                            Height="34"
+                            Click="BtnCopyLog_Click"
+                            Content="复制全部日志"/>
+                    <Button Grid.Column="2"
+                            Style="{StaticResource SecondaryLightButtonStyle}"
+                            Height="34"
+                            Click="BtnClearLog_Click"
+                            Content="清空日志"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
