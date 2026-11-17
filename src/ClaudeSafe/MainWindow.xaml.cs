@@ -36,6 +36,9 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _checkCts;
     private WinForms.NotifyIcon? _trayIcon;
     private bool _isExplicitExit;
+    private bool _isRestartingAsAdmin;
+    private bool _killClaudeOnExit = true;
+    private int _exitCleanupExecuted;
     private bool _isCircuitBreakerDialogOpen;
     private bool _hasShownTrayHint;
     private bool _isLaunchingOrChecking;
@@ -849,6 +852,7 @@ public partial class MainWindow : Window
     {
         if (_firewall.TryRestartAsAdmin())
         {
+            _isRestartingAsAdmin = true;
             ExitApplicationCompletely();
         }
         else
@@ -993,13 +997,77 @@ public partial class MainWindow : Window
 
     private void ExitApplicationCompletely()
     {
+        _killClaudeOnExit = true;
+
+        if (!_isRestartingAsAdmin && _processService.GetRunningClaudeProcessCount() > 0)
+        {
+            RestoreAndFocusWindow();
+            var answer = MessageBox.Show(
+                this,
+                "Claude Desktop 正在运行，是否同步退出？\n\n• 点击【是】：同步关闭 Claude Desktop，并退出 ClaudeSafe（还原所有网络、防火墙与 Hosts 设置）。\n• 点击【否】：保留 Claude Desktop，仅退出 ClaudeSafe 并还原系统设置。\n• 点击【取消】：取消退出，继续保持后台安全守护。",
+                "退出确认",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            if (answer == MessageBoxResult.Cancel || answer == MessageBoxResult.None)
+                return;
+
+            _killClaudeOnExit = answer == MessageBoxResult.Yes;
+        }
+
         _isExplicitExit = true;
         Close();
     }
 
+    public void PerformExitCleanup(bool isRestartingAsAdmin = false)
+    {
+        _isExplicitExit = true;
+        if (Interlocked.Exchange(ref _exitCleanupExecuted, 1) != 0)
+            return;
+
+        try
+        {
+            _checkCts?.Cancel();
+            _checkCts?.Dispose();
+            _checkCts = null;
+        }
+        catch
+        {
+            // Ignore cancellation cleanup errors
+        }
+
+        _watchdog.ShutdownAndRestoreAllOnExit(
+            "ClaudeSafe 退出，还原所有系统网络、防火墙与 Hosts 设置",
+            allowElevateIfNeeded: !isRestartingAsAdmin,
+            killClaudeProcesses: !isRestartingAsAdmin && _killClaudeOnExit);
+        _watchdog.Dispose();
+
+        var restoreRes = _systemProxy.RestoreSystemProxyOnExit(_gatekeeper.ListeningPort);
+        if (Dispatcher.CheckAccess())
+        {
+            AppendLog(restoreRes.Message);
+        }
+
+        _gatekeeper.Dispose();
+
+        if (_trayIcon != null)
+        {
+            try
+            {
+                _trayIcon.Visible = false;
+                _trayIcon.Dispose();
+            }
+            catch
+            {
+                // Ignore tray disposal errors during shutdown
+            }
+            _trayIcon = null;
+        }
+    }
+
     private void Window_Closing(object? sender, CancelEventArgs e)
     {
-        // 关闭窗口默认最小化到托盘保持后台常驻守护；仅通过托盘菜单或设置内“彻底退出”才结束进程
+        // 关闭窗口默认最小化到托盘保持后台常驻守护；仅通过托盘菜单、设置内“彻底退出”或系统注销关机才结束进程
         if (!_isExplicitExit)
         {
             e.Cancel = true;
@@ -1007,22 +1075,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        _checkCts?.Cancel();
-        _checkCts?.Dispose();
-
-        _watchdog.CleanExitClaudeAndLockAll("ClaudeSafe 彻底退出，执行最终清理与流量封锁");
-        _watchdog.Dispose();
-
-        var restoreRes = _systemProxy.RestoreSystemProxyOnExit(_gatekeeper.ListeningPort);
-        AppendLog(restoreRes.Message);
-        _gatekeeper.Dispose();
-
-        if (_trayIcon != null)
-        {
-            _trayIcon.Visible = false;
-            _trayIcon.Dispose();
-            _trayIcon = null;
-        }
+        PerformExitCleanup(_isRestartingAsAdmin);
     }
 
     private static SolidColorBrush CreateBrush(string hex)

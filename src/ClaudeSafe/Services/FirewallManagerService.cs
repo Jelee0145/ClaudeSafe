@@ -168,6 +168,14 @@ public sealed class FirewallManagerService
     {
         if (!IsRunningAsAdmin())
         {
+            if (!keepForceProxyOnly && HasResidualSystemBlocks())
+            {
+                if (TryRunElevatedCleanAll())
+                {
+                    return new FirewallActionResult(true, false, "已提权清理全部防火墙与 Hosts 封锁规则");
+                }
+            }
+
             return new FirewallActionResult(true, false, "标准权限模式（仅由守门代理与启动参数限制代理通道）");
         }
 
@@ -193,7 +201,7 @@ public sealed class FirewallManagerService
             else if (!keepForceProxyOnly)
             {
                 RunHiddenCommand("netsh", $"advfirewall firewall delete rule name=\"{FirewallForceProxyOnlyRuleName}\"");
-                notes.Add("已临时移除 Claude 禁直连防火墙（允许 3P 模式自由联网）");
+                notes.Add("已彻底移除 Claude 防火墙规则");
             }
         }
         catch (Exception ex)
@@ -215,6 +223,105 @@ public sealed class FirewallManagerService
         }
 
         return new FirewallActionResult(true, true, string.Join("；", notes));
+    }
+
+    public bool HasResidualSystemBlocks()
+    {
+        try
+        {
+            var path = HostsFilePath;
+            if (File.Exists(path))
+            {
+                var content = File.ReadAllText(path, Encoding.UTF8);
+                if (content.Contains(HostsBeginMarker, StringComparison.Ordinal))
+                    return true;
+            }
+        }
+        catch
+        {
+            // Ignore hosts read failure and still check firewall rules
+        }
+
+        foreach (var ruleName in new[] { FirewallRuleName, FirewallIpRuleName, FirewallForceProxyOnlyRuleName })
+        {
+            try
+            {
+                var (code, _) = RunHiddenCommand("netsh", $"advfirewall firewall show rule name=\"{ruleName}\"");
+                if (code == 0)
+                    return true;
+            }
+            catch
+            {
+                // Ignore netsh query failures
+            }
+        }
+
+        return false;
+    }
+
+    public FirewallActionResult RestoreAllOnExit(bool allowElevateIfNeeded = true)
+    {
+        if (IsRunningAsAdmin())
+        {
+            return RemoveTrafficBlock(keepForceProxyOnly: false);
+        }
+
+        if (!HasResidualSystemBlocks())
+        {
+            return new FirewallActionResult(true, false, "无残留防火墙或 Hosts 封锁规则");
+        }
+
+        if (allowElevateIfNeeded && TryRunElevatedCleanAll())
+        {
+            return new FirewallActionResult(true, false, "已提权彻底清除残留防火墙与 Hosts 封锁（不留痕）");
+        }
+
+        return new FirewallActionResult(false, false, "存在需要管理员权限清理的防火墙或 Hosts 残留规则");
+    }
+
+    public static bool TryRunElevatedCleanAll()
+    {
+        try
+        {
+            var exePath = ResolveSelfExecutablePath();
+            if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                return false;
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = exePath,
+                Arguments = "--clean-all --elevated",
+                UseShellExecute = true,
+                Verb = "runas"
+            };
+
+            using var proc = Process.Start(psi);
+            if (proc == null)
+                return false;
+
+            proc.WaitForExit(8000);
+            return proc.HasExited && proc.ExitCode == 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static string? ResolveSelfExecutablePath()
+    {
+        var exePath = Environment.ProcessPath;
+        if (string.IsNullOrWhiteSpace(exePath))
+            return null;
+
+        if (Path.GetFileName(exePath).Equals("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+        {
+            var candidate = Path.ChangeExtension(typeof(FirewallManagerService).Assembly.Location, ".exe");
+            if (File.Exists(candidate))
+                exePath = candidate;
+        }
+
+        return exePath;
     }
 
     private static int ApplyForceProxyOnlyRuleInternal(IReadOnlyCollection<string> validExes)
@@ -239,16 +346,9 @@ public sealed class FirewallManagerService
     {
         try
         {
-            var exePath = Environment.ProcessPath;
+            var exePath = ResolveSelfExecutablePath();
             if (string.IsNullOrWhiteSpace(exePath))
                 return false;
-
-            if (Path.GetFileName(exePath).Equals("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-            {
-                var candidate = Path.ChangeExtension(typeof(FirewallManagerService).Assembly.Location, ".exe");
-                if (File.Exists(candidate))
-                    exePath = candidate;
-            }
 
             var psi = new ProcessStartInfo
             {
@@ -304,9 +404,10 @@ public sealed class FirewallManagerService
         return targets;
     }
 
-    private static void WriteHostsBlockSection()
+    private static void WriteHostsBlockSection() => WriteHostsBlockSectionToFile(HostsFilePath);
+
+    internal static void WriteHostsBlockSectionToFile(string path)
     {
-        var path = HostsFilePath;
         var existing = File.Exists(path) ? File.ReadAllText(path, Encoding.UTF8) : string.Empty;
         var cleaned = StripHostsBlockSection(existing);
 
@@ -328,9 +429,10 @@ public sealed class FirewallManagerService
         File.WriteAllText(path, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
     }
 
-    private static bool RemoveHostsBlockSection()
+    private static bool RemoveHostsBlockSection() => RemoveHostsBlockSectionFromFile(HostsFilePath);
+
+    internal static bool RemoveHostsBlockSectionFromFile(string path)
     {
-        var path = HostsFilePath;
         if (!File.Exists(path))
             return false;
 
@@ -343,7 +445,7 @@ public sealed class FirewallManagerService
         return true;
     }
 
-    private static string StripHostsBlockSection(string content)
+    internal static string StripHostsBlockSection(string content)
     {
         var lines = content.Replace("\r\n", "\n").Split('\n');
         var result = new List<string>(lines.Length);
@@ -370,7 +472,8 @@ public sealed class FirewallManagerService
             }
         }
 
-        return string.Join(Environment.NewLine, result).TrimEnd() + Environment.NewLine;
+        var joined = string.Join(Environment.NewLine, result).TrimEnd();
+        return string.IsNullOrEmpty(joined) ? string.Empty : joined + Environment.NewLine;
     }
 
     private static (int ExitCode, string Output) RunHiddenCommand(string fileName, string arguments)

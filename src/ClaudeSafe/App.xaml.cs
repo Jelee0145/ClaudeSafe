@@ -16,6 +16,7 @@ public partial class App : Application
     private bool _hasMutexHandle;
     private EventWaitHandle? _activateEvent;
     private RegisteredWaitHandle? _registeredWait;
+    private MainWindow? _mainWindow;
 
     [DllImport("kernel32.dll")]
     private static extern bool AttachConsole(int dwProcessId);
@@ -42,6 +43,31 @@ public partial class App : Application
             }
 
             int exitCode = SelfTestRunner.RunAsync().GetAwaiter().GetResult();
+            Environment.ExitCode = exitCode;
+            Shutdown(exitCode);
+            return;
+        }
+
+        if (e.Args.Any(a => string.Equals(a, "--clean-all", StringComparison.OrdinalIgnoreCase)))
+        {
+            bool alreadyElevatedAttempt = e.Args.Any(a => string.Equals(a, "--elevated", StringComparison.OrdinalIgnoreCase));
+            var fw = new FirewallManagerService();
+            int exitCode;
+
+            if (fw.IsRunningAsAdmin())
+            {
+                var fwRes = fw.RemoveTrafficBlock(keepForceProxyOnly: false);
+                var sysRes = new SystemProxyService().RestoreSystemProxyOnExit(0);
+                exitCode = fwRes.Success && sysRes.Success ? 0 : 1;
+            }
+            else
+            {
+                var sysRes = new SystemProxyService().RestoreSystemProxyOnExit(0);
+                bool fwCleanOk = !fw.HasResidualSystemBlocks() ||
+                                 (!alreadyElevatedAttempt && FirewallManagerService.TryRunElevatedCleanAll());
+                exitCode = sysRes.Success && fwCleanOk ? 0 : 1;
+            }
+
             Environment.ExitCode = exitCode;
             Shutdown(exitCode);
             return;
@@ -81,7 +107,9 @@ public partial class App : Application
 
         bool startMinimized = e.Args.Any(a => string.Equals(a, "--minimized", StringComparison.OrdinalIgnoreCase));
         var mainWindow = new MainWindow(startMinimized);
+        _mainWindow = mainWindow;
         MainWindow = mainWindow;
+        AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
         _activateEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ActivateEventName);
         _registeredWait = ThreadPool.RegisterWaitForSingleObject(
@@ -94,8 +122,43 @@ public partial class App : Application
         mainWindow.Show();
     }
 
+    private void CurrentDomain_ProcessExit(object? sender, EventArgs e)
+    {
+        try
+        {
+            _mainWindow?.PerformExitCleanup(isRestartingAsAdmin: true);
+        }
+        catch
+        {
+            // Ignore cleanup errors during process exit
+        }
+    }
+
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+    {
+        base.OnSessionEnding(e);
+        try
+        {
+            _mainWindow?.PerformExitCleanup(isRestartingAsAdmin: true);
+        }
+        catch
+        {
+            // Ignore cleanup errors during OS shutdown/logoff
+        }
+    }
+
     protected override void OnExit(ExitEventArgs e)
     {
+        try
+        {
+            AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
+            _mainWindow?.PerformExitCleanup();
+        }
+        catch
+        {
+            // Ignore cleanup errors on exit
+        }
+
         try
         {
             _registeredWait?.Unregister(null);

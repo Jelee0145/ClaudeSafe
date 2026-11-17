@@ -192,6 +192,48 @@ public sealed class RuntimeWatchdogService : IDisposable
         OnLog?.Invoke($"[安全清理] {reason}：切断 {severed} 条连接，强杀 {killed} 个主/子进程。系统封锁：{fwResult.Message}");
     }
 
+    /// <summary>
+    /// 程序彻底退出时停止看门狗、按需关闭运行中的 Claude，并彻底还原防火墙与 Hosts 设置（不留痕）
+    /// </summary>
+    public void ShutdownAndRestoreAllOnExit(string reason, bool allowElevateIfNeeded = true, bool killClaudeProcesses = true)
+    {
+        CancellationTokenSource? ctsToStop;
+        Task? taskToWait;
+
+        lock (_stateLock)
+        {
+            ctsToStop = _loopCts;
+            taskToWait = _watchdogTask;
+            _loopCts = null;
+            _watchdogTask = null;
+        }
+
+        // 1. 先停看门狗线程，防止退出清理期间并发巡检重新下发封锁规则
+        try { ctsToStop?.Cancel(); } catch { }
+        try { taskToWait?.Wait(800); } catch { }
+        try { ctsToStop?.Dispose(); } catch { }
+
+        // 2. 切断守门代理活跃连接，并根据用户选择决定是否同步关闭 Claude 进程
+        _gatekeeper.SetManualBypass(false);
+        int severed = _gatekeeper.LockGateAndSeverAll(reason);
+        int killed = killClaudeProcesses
+            ? _processService.KillAllClaudeProcesses()
+            : 0;
+
+        // 3. 彻底移除所有防火墙规则与 Hosts 黑洞，还原不留痕
+        var fwRestore = _firewall.RestoreAllOnExit(allowElevateIfNeeded);
+
+        lock (_stateLock)
+        {
+            _remainingCooldownSeconds = 0;
+            _cooldownHadRunningClaude = false;
+            _boundSafeIp = null;
+            _state = AppProtectionState.LockedIdle;
+        }
+
+        OnLog?.Invoke($"[退出还原] {reason}：切断 {severed} 条连接，清理 {killed} 个进程；{fwRestore.Message}");
+    }
+
     public void TriggerCircuitBreaker(string reason, IpGeoInfo? currentIp, bool isSimulation = false)
     {
         IpGeoInfo? expectedIp;

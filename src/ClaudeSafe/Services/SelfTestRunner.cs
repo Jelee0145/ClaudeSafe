@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ClaudeSafe.Models;
+using Microsoft.Win32;
 
 namespace ClaudeSafe.Services;
 
@@ -33,6 +34,9 @@ public static class SelfTestRunner
 
         // 4. 测试 ConfigService 持久化读写与历史 IP 基线记录
         results.Add(TestConfigPersistence());
+
+        // 5. 测试退出还原（系统代理还原、PAC 清理及 Hosts 区块无痕移除）
+        results.Add(TestExitCleanupLeavesNoTrace());
 
         Console.WriteLine("============================================================");
         Console.WriteLine("ClaudeSafe 自动化自检报告 (--self-test)");
@@ -449,6 +453,97 @@ public static class SelfTestRunner
         finally
         {
             try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
+        }
+    }
+
+    private static (string Name, bool Passed, string Detail) TestExitCleanupLeavesNoTrace()
+    {
+        var tempBackup = Path.Combine(Path.GetTempPath(), $"claudesafe_proxy_bak_{Guid.NewGuid():N}.json");
+        var tempHosts = Path.Combine(Path.GetTempPath(), $"claudesafe_hosts_{Guid.NewGuid():N}.txt");
+        try
+        {
+            // A. 验证 Hosts 写入与退出剥离无残留
+            const string originalHosts = "127.0.0.1 custom-dev.local\r\n";
+            File.WriteAllText(tempHosts, originalHosts, Encoding.UTF8);
+            FirewallManagerService.WriteHostsBlockSectionToFile(tempHosts);
+            var blockedContent = File.ReadAllText(tempHosts, Encoding.UTF8);
+            if (!blockedContent.Contains("# BEGIN CLAUDESAFE BLOCK", StringComparison.Ordinal) ||
+                !blockedContent.Contains("0.0.0.0 claude.ai", StringComparison.Ordinal))
+            {
+                return ("退出无痕还原验证 (代理/PAC/Hosts)", false, "Hosts 测试区块写入失败");
+            }
+
+            if (!FirewallManagerService.RemoveHostsBlockSectionFromFile(tempHosts))
+            {
+                return ("退出无痕还原验证 (代理/PAC/Hosts)", false, "Hosts 测试区块移除返回 false");
+            }
+
+            var restoredHosts = File.ReadAllText(tempHosts, Encoding.UTF8);
+            if (!string.Equals(restoredHosts.Trim(), "127.0.0.1 custom-dev.local", StringComparison.Ordinal) ||
+                restoredHosts.Contains("CLAUDESAFE", StringComparison.Ordinal) ||
+                restoredHosts.Contains("claude.ai", StringComparison.Ordinal))
+            {
+                return ("退出无痕还原验证 (代理/PAC/Hosts)", false, $"Hosts 移除后仍有残留: {restoredHosts}");
+            }
+
+            // 空 Hosts 场景：剥离后应彻底为空
+            var emptyStripped = FirewallManagerService.StripHostsBlockSection(
+                "# BEGIN CLAUDESAFE BLOCK\r\n0.0.0.0 claude.ai\r\n# END CLAUDESAFE BLOCK\r\n");
+            if (!string.IsNullOrEmpty(emptyStripped))
+            {
+                return ("退出无痕还原验证 (代理/PAC/Hosts)", false, "空 Hosts 剥离后仍有空白残留");
+            }
+
+            // B. 验证 SystemProxyService 备份、PAC 写入及无痕恢复（包含 gatekeeperPort=0 的跨会话兜底清理）
+            const string subKey = @"Software\Microsoft\Windows\CurrentVersion\Internet Settings";
+            string? beforePac;
+            object? beforeEnable;
+            string? beforeServer;
+            using (var key = Registry.CurrentUser.OpenSubKey(subKey, writable: false))
+            {
+                beforePac = key?.GetValue("AutoConfigURL")?.ToString();
+                beforeEnable = key?.GetValue("ProxyEnable");
+                beforeServer = key?.GetValue("ProxyServer")?.ToString();
+            }
+
+            var proxySvc = new SystemProxyService(tempBackup);
+            var applyRes = proxySvc.CaptureBackupAndApplyGatekeeper(59997, isGateOpen: false);
+            if (!applyRes.Success || !File.Exists(tempBackup))
+            {
+                return ("退出无痕还原验证 (代理/PAC/Hosts)", false, $"系统代理接管或备份失败: {applyRes.Message}");
+            }
+
+            // 以 gatekeeperPort=0 验证基于 /pac.js?state= 的通用残留清理
+            var restoreRes = new SystemProxyService(tempBackup).RestoreSystemProxyOnExit(0);
+            if (!restoreRes.Success || File.Exists(tempBackup))
+            {
+                return ("退出无痕还原验证 (代理/PAC/Hosts)", false, $"系统代理恢复或清理备份文件失败: {restoreRes.Message}");
+            }
+
+            using (var keyAfter = Registry.CurrentUser.OpenSubKey(subKey, writable: false))
+            {
+                var afterPac = keyAfter?.GetValue("AutoConfigURL")?.ToString();
+                var afterEnable = keyAfter?.GetValue("ProxyEnable");
+                var afterServer = keyAfter?.GetValue("ProxyServer")?.ToString();
+                if (!string.Equals(beforePac, afterPac, StringComparison.Ordinal) ||
+                    !Equals(beforeEnable, afterEnable) ||
+                    !string.Equals(beforeServer, afterServer, StringComparison.Ordinal))
+                {
+                    return ("退出无痕还原验证 (代理/PAC/Hosts)", false, "注册表系统代理设置未完全还原至测试前状态");
+                }
+            }
+
+            return ("退出无痕还原验证 (代理/PAC/Hosts)", true,
+                "Hosts 区块无痕剥离、注册表代理/PAC 还原及备份文件清理全部校验通过");
+        }
+        catch (Exception ex)
+        {
+            return ("退出无痕还原验证 (代理/PAC/Hosts)", false, $"异常: {ex.Message}");
+        }
+        finally
+        {
+            try { if (File.Exists(tempBackup)) File.Delete(tempBackup); } catch { }
+            try { if (File.Exists(tempHosts)) File.Delete(tempHosts); } catch { }
         }
     }
 }

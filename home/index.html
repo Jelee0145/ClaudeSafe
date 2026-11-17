@@ -332,45 +332,53 @@
       align-items: center;
     }
 
-    .sim-tabs {
+    .sim-external-bar {
+      margin-top: 14px;
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       justify-content: center;
-      gap: 6px;
-      background: var(--bg-secondary);
-      border: 1px solid #DFDCD2;
-      padding: 5px;
-      border-radius: 14px;
-      margin-bottom: 18px;
+      gap: 10px;
     }
 
-    .sim-tab {
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
+    .sim-ext-btn {
+      padding: 7px 14px;
+      border-radius: 999px;
       font-size: 12.5px;
       font-weight: 600;
-      padding: 7px 12px;
-      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       transition: all 0.16s ease;
+      border: 1px solid transparent;
     }
 
-    .sim-tab:hover {
-      color: var(--text-primary);
+    .sim-ext-btn:hover {
+      transform: translateY(-1px);
     }
 
-    .sim-tab.active {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      box-shadow: 0 2px 6px rgba(20, 20, 19, 0.08);
-    }
-
-    .sim-tab[data-tab="danger"].active {
-      color: var(--danger-text);
-    }
-
-    .sim-tab[data-tab="breaker"].active {
+    .sim-ext-btn.breaker {
+      background: var(--danger-soft-bg);
       color: var(--danger-deep);
+      border-color: var(--danger-card-border);
+    }
+
+    .sim-ext-btn.breaker:hover {
+      background: #FADCD6;
+    }
+
+    .sim-ext-btn.reset {
+      background: var(--bg-secondary);
+      color: var(--text-dark-sub);
+      border-color: #DFDCD2;
+    }
+
+    .sim-ext-btn.reset:hover {
+      background: #E7E4DA;
+    }
+
+    .sim-ext-btn[hidden] {
+      display: none;
     }
 
     /* WPF MainWindow Replica (405 x 540 ratio) */
@@ -431,6 +439,16 @@
       font-size: 10px;
       font-weight: 500;
       color: var(--warn-text);
+    }
+
+    .wpf-admin-mini.safe {
+      background: #E7F6EE;
+      color: #18794E;
+    }
+
+    .wpf-admin-mini.danger {
+      background: #FEF2F2;
+      color: #C93B2B;
     }
 
     .wpf-title-btns {
@@ -516,6 +534,40 @@
       color: var(--text-secondary);
     }
 
+    .wpf-ip-pill.safe {
+      background: #E7F6EE;
+      border-color: #BBE5CE;
+      color: #18794E;
+    }
+
+    .wpf-ip-pill.warn {
+      background: #FFFBEB;
+      border-color: #FDE68A;
+      color: #B45309;
+    }
+
+    .wpf-ip-pill.danger {
+      background: #FEF2F2;
+      border-color: #FECACA;
+      color: #C93B2B;
+    }
+
+    .wpf-recheck-chip {
+      background: var(--bg-card);
+      border: 1px solid #DFDCD2;
+      border-radius: 10px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+    }
+
+    .wpf-recheck-chip:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
     .wpf-cooldown-pill {
       background: #FEF3C7;
       border: 1px solid #F59E0B;
@@ -568,6 +620,10 @@
       background: var(--bg-page);
       font-size: 11px;
       min-width: 0;
+    }
+
+    .wpf-capsule[title] {
+      cursor: help;
     }
 
     .wpf-capsule .dot {
@@ -632,6 +688,9 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      max-height: 148px;
+      overflow-y: auto;
+      padding-right: 2px;
     }
 
     .wpf-issue-card {
@@ -697,6 +756,22 @@
     .wpf-primary-btn:disabled {
       opacity: 0.55;
       cursor: not-allowed;
+    }
+
+    .wpf-secondary-kill-btn {
+      width: 100%;
+      height: 34px;
+      border: none;
+      border-radius: 10px;
+      background: var(--danger-text);
+      color: #FFFFFF;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: opacity 0.16s ease;
+    }
+
+    .wpf-secondary-kill-btn:hover {
+      opacity: 0.92;
     }
 
     .wpf-bottom-row {
@@ -1319,8 +1394,8 @@
           </svg>
           GitHub
         </a>
-        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-x64-standalone.exe" class="btn btn-primary btn-sm">
-          立即下载 v1.0.0
+        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-x64-standalone.exe" class="btn btn-primary btn-sm">
+          立即下载 v1.0.1
         </a>
       </div>
     </div>
@@ -1333,7 +1408,7 @@
         <div>
           <div class="badge-pill">
             <span class="badge-dot"></span>
-            <span>v1.0.0 正式发布 · .NET 8 WPF 零第三方依赖</span>
+            <span>v1.0.1 正式发布 · .NET 8 WPF 零第三方依赖</span>
           </div>
           <h1 class="hero-title">
             ClaudeSafe — Claude 中国用户<span>安全启动与防封号卫士</span>
@@ -1343,22 +1418,22 @@
           </p>
 
           <div class="hero-cta-group">
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-x64-standalone.exe" class="btn btn-primary btn-lg">
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-x64-standalone.exe" class="btn btn-primary btn-lg">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              下载独立单文件版 .exe (68.4 MB)
+              下载独立单文件版 .exe (154.4 MB)
             </a>
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-framework-dependent.zip" class="btn btn-secondary btn-lg">
-              下载精简框架依赖版 .zip (147.6 KB)
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-framework-dependent.zip" class="btn btn-secondary btn-lg">
+              下载精简框架依赖版 .zip (150.3 KB)
             </a>
           </div>
 
           <div class="hero-meta-links">
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.0" target="_blank" rel="noopener noreferrer">
-              查看 v1.0.0 Release 说明 →
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.1" target="_blank" rel="noopener noreferrer">
+              查看 v1.0.1 Release 说明 →
             </a>
             <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer">
               浏览源代码仓库 →
@@ -1384,17 +1459,19 @@
 
         <!-- Right: 1:1 Interactive Desktop App Simulator -->
         <div class="simulator-wrap">
-          <div class="sim-tabs" role="tablist" aria-label="客户端状态演示切换">
-            <button class="sim-tab active" data-tab="safe" role="tab" aria-selected="true">安全通过态</button>
-            <button class="sim-tab" data-tab="danger" role="tab" aria-selected="false">高危阻断态</button>
-            <button class="sim-tab" data-tab="breaker" role="tab" aria-selected="false">紧急熔断弹窗</button>
-            <button class="sim-tab" data-tab="idle" role="tab" aria-selected="false">待检与 3P 解锁</button>
-          </div>
-
           <div id="simulatorHost" aria-live="polite"></div>
 
+          <div class="sim-external-bar" aria-label="组件外部测试控制">
+            <button class="sim-ext-btn breaker" type="button" id="extTestBreakerBtn">
+              ⚡ 测试断流熔断机制
+            </button>
+            <button class="sim-ext-btn reset" type="button" id="extResetSimBtn" hidden>
+              ↺ 恢复初始待启动状态
+            </button>
+          </div>
+
           <div id="simHintBar" class="sim-hint-bar">
-            提示：切换到「待检与 3P 解锁」可点击主按钮模拟 6 维体检，或长按星芒 Logo 1 秒体验 3P 临时解锁。
+            提示：点击「检测网络并安全启动」将真实探测出口 IP 与 claude.ai 连通性；通过后自动进入「受控安全运行中」，长按 Logo 1 秒可解锁 3P 模式。
           </div>
         </div>
       </div>
@@ -1529,9 +1606,9 @@
               </p>
             </div>
             <div class="pillar">
-              <div class="pillar-title">🛡️ 退出清理与常态防裸连</div>
+              <div class="pillar-title">🛡️ 退出无痕还原与常态防裸连</div>
               <p class="pillar-desc">
-                退出 Claude 时自动锁死守门阀门，并通过 Windows 防火墙出站规则与 Hosts 域名黑洞封锁（管理员模式）+ 进程看门狗拦截未经体检的直接双击启动；长按主界面星芒 Logo 1 秒可临时解锁 3P 模式。
+                后台驻留守护期间通过防火墙出站规则、Hosts 黑洞（管理员模式）及进程看门狗拦截未经体检的直接双击启动；彻底退出 ClaudeSafe 时若检测到 Claude Desktop 仍在运行会弹窗确认是否同步退出，并无痕还原所有系统代理、防火墙规则与 Hosts 设置；长按主界面星芒 Logo 1 秒可临时解锁 3P 模式。
               </p>
             </div>
           </div>
@@ -1543,8 +1620,8 @@
     <section id="download" class="section section-alt">
       <div class="container">
         <div class="section-header">
-          <span class="section-kicker">GitHub Release v1.0.0</span>
-          <h2 class="section-title">下载 ClaudeSafe v1.0.0 并校验完整性</h2>
+          <span class="section-kicker">GitHub Release v1.0.1</span>
+          <h2 class="section-title">下载 ClaudeSafe v1.0.1 并校验完整性</h2>
           <p class="section-subtitle">
             所有编译产物均托管于 GitHub Releases，基于 .NET 8 WPF 原生构建，无任何第三方运行库依赖。
           </p>
@@ -1555,7 +1632,7 @@
             <div>
               <span class="dl-badge primary">推荐 · 开箱即用</span>
               <h3 class="dl-title">Windows x64 独立单文件版</h3>
-              <div class="dl-filename">ClaudeSafe-v1.0.0-win-x64-standalone.exe · 68.4 MB (71,713,935 bytes)</div>
+              <div class="dl-filename">ClaudeSafe-v1.0.1-win-x64-standalone.exe · 154.4 MB (161,906,137 bytes)</div>
               <ul class="dl-specs">
                 <li>内置 .NET 8 Windows Desktop 运行时，无需额外配置环境</li>
                 <li>单可执行文件，双击即可运行与守护</li>
@@ -1564,12 +1641,12 @@
               <div class="sha-box">
                 <div class="sha-header">
                   <span>SHA256</span>
-                  <button class="copy-btn" data-copy="2CED4E0BD23E11AE6A01D3F3E481252BB7688C39E5213E5870D4A9AFF70EBC74">复制校验码</button>
+                  <button class="copy-btn" data-copy="1D55FE4F0B56A3EEE5C8C8DEC9E4F001E12273568FD4809230BB446693B0116C">复制校验码</button>
                 </div>
-                <div class="sha-hash">2CED4E0BD23E11AE6A01D3F3E481252BB7688C39E5213E5870D4A9AFF70EBC74</div>
+                <div class="sha-hash">1D55FE4F0B56A3EEE5C8C8DEC9E4F001E12273568FD4809230BB446693B0116C</div>
               </div>
             </div>
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-x64-standalone.exe" class="btn btn-primary btn-lg" style="width: 100%;">
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-x64-standalone.exe" class="btn btn-primary btn-lg" style="width: 100%;">
               从 GitHub Release 下载单文件版
             </a>
           </article>
@@ -1578,21 +1655,21 @@
             <div>
               <span class="dl-badge secondary">轻量 · 需 .NET 8 Desktop Runtime</span>
               <h3 class="dl-title">精简框架依赖版</h3>
-              <div class="dl-filename">ClaudeSafe-v1.0.0-win-framework-dependent.zip · 147.6 KB (151,176 bytes)</div>
+              <div class="dl-filename">ClaudeSafe-v1.0.1-win-framework-dependent.zip · 150.3 KB (153,953 bytes)</div>
               <ul class="dl-specs">
-                <li>体积仅约 148 KB，包含主程序及运行时配置文件（4 个文件）</li>
+                <li>体积仅约 150 KB，包含主程序及运行时配置文件（4 个文件）</li>
                 <li>需本机预先安装 Microsoft .NET 8 Desktop Runtime</li>
                 <li>解压至任意目录后运行 <code>ClaudeSafe.exe</code> 即可</li>
               </ul>
               <div class="sha-box">
                 <div class="sha-header">
                   <span>SHA256</span>
-                  <button class="copy-btn" data-copy="2B6EE718FC27C3C526E7FD7CECD7E2FDFC4181919CC598DA1951103782E92049">复制校验码</button>
+                  <button class="copy-btn" data-copy="B1E2FCC16D717DA33059C2E8ED4204C19F65BFEDA4AEB1514238F9C6A05B1FF8">复制校验码</button>
                 </div>
-                <div class="sha-hash">2B6EE718FC27C3C526E7FD7CECD7E2FDFC4181919CC598DA1951103782E92049</div>
+                <div class="sha-hash">B1E2FCC16D717DA33059C2E8ED4204C19F65BFEDA4AEB1514238F9C6A05B1FF8</div>
               </div>
             </div>
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-framework-dependent.zip" class="btn btn-secondary btn-lg" style="width: 100%;">
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-framework-dependent.zip" class="btn btn-secondary btn-lg" style="width: 100%;">
               从 GitHub Release 下载精简压缩包
             </a>
           </article>
@@ -1601,8 +1678,8 @@
         <div class="cli-box">
           <div class="cli-col">
             <h4>PowerShell 校验下载文件 SHA256</h4>
-            <pre>Get-FileHash .\ClaudeSafe-v1.0.0-win-x64-standalone.exe -Algorithm SHA256
-# 预期输出: 2CED4E0BD23E11AE6A01D3F3E481252BB7688C39E5213E5870D4A9AFF70EBC74</pre>
+            <pre>Get-FileHash .\ClaudeSafe-v1.0.1-win-x64-standalone.exe -Algorithm SHA256
+# 预期输出: 1D55FE4F0B56A3EEE5C8C8DEC9E4F001E12273568FD4809230BB446693B0116C</pre>
           </div>
           <div class="cli-col">
             <h4>从源码本地编译与模块自检</h4>
@@ -1631,7 +1708,7 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
       <div class="footer-links">
         <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
         <a href="https://github.com/Jelee0145/ClaudeSafe/releases/latest" target="_blank" rel="noopener noreferrer">最新 Release</a>
-        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.0" target="_blank" rel="noopener noreferrer">v1.0.0 发布页</a>
+        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.1" target="_blank" rel="noopener noreferrer">v1.0.1 发布页</a>
         <a href="https://github.com/Jelee0145/ClaudeSafe/issues" target="_blank" rel="noopener noreferrer">问题反馈 (Issues)</a>
       </div>
 
@@ -1645,41 +1722,65 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
     (function () {
       const STARBURST_PATH = "M46.8,10 L53.2,10 L52.2,41.5 L72.5,17.2 L77.5,21.4 L55.8,44.4 L87.2,36.2 L88.8,42.4 L57.1,49.1 L85.5,64.8 L82.3,70.4 L54.6,53.4 L67.8,83.4 L61.9,85.9 L50,55.8 L38.1,85.9 L32.2,83.4 L45.4,53.4 L17.7,70.4 L14.5,64.8 L42.9,49.1 L11.2,42.4 L12.8,36.2 L44.2,44.4 L22.5,21.4 L27.5,17.2 L47.8,41.5 Z";
 
-      const SAFE_PILLS = [
-        { name: "本地代理", val: "7890 · 18ms", level: "safe" },
-        { name: "出口地区", val: "US · 合规", level: "safe" },
-        { name: "IP 纯净度", val: "原生 ISP", level: "safe" },
-        { name: "历史漂移", val: "一致 · 无漂移", level: "safe" },
-        { name: "Anthropic", val: "trace=US", level: "safe" },
-        { name: "系统时区", val: "建议校准", level: "warn" }
+      const BLOCKED_COUNTRIES = new Set(["CN", "HK", "MO", "RU", "BY", "KP", "IR", "SY", "CU"]);
+      const ASIAN_UTC8_9_COUNTRIES = new Set(["TW", "SG", "MY", "PH", "JP", "KR", "AU"]);
+      const DATACENTER_KEYWORDS = [
+        "Cloudflare", "Datacamp", "Choopa", "Vultr", "DigitalOcean", "Linode", "Akamai",
+        "Amazon", "AWS", "Google", "Microsoft", "Azure", "Hetzner", "OVH", "DMIT",
+        "IT7", "Cogent", "Zenlayer", "Leaseweb", "M247", "Tzulo", "Multacom", "RackNerd",
+        "Aliyun", "Alibaba", "Tencent", "Oracle", "Contabo", "BuyVM", "Bandwagon",
+        "Misaka", "ColoCrossing", "GCore", "Quadranet", "Psychz", "Scaleway", "Kamatera"
       ];
-
-      const DANGER_PILLS = [
-        { name: "本地代理", val: "7890 · 已连通", level: "safe" },
-        { name: "出口地区", val: "HK · 高危封禁", level: "danger" },
-        { name: "IP 纯净度", val: "数据中心 ASN", level: "warn" },
-        { name: "历史漂移", val: "US → HK 跨区", level: "danger" },
-        { name: "Anthropic", val: "trace=CN 泄漏", level: "danger" },
-        { name: "系统时区", val: "UTC+8", level: "safe" }
-      ];
+      const COMMON_PROXY_PORTS = [7890, 7897, 10808, 10809, 1080, 2080, 7891];
+      const BASELINE_STORAGE_KEY = "claudesafe_last_safe_ip";
 
       const host = document.getElementById("simulatorHost");
       const hintBar = document.getElementById("simHintBar");
-      const tabBtns = Array.from(document.querySelectorAll(".sim-tab"));
+      const extTestBreakerBtn = document.getElementById("extTestBreakerBtn");
+      const extResetSimBtn = document.getElementById("extResetSimBtn");
 
-      let currentTab = "safe";
-      let idleSubState = "locked"; // locked | checking | checked | unlocked3p
-      let cbState = "countdown"; // countdown | cooldown | killed
+      let simState = "locked"; // locked | checking | launching | running | blocked | unlocked3p | breaker | cooldown
+      let lastRealReport = null;
+      let checkProgress = null;
+      let activeCheckId = 0;
+      let launchTransitionTimer = null;
+      let cbState = "countdown"; // countdown | killed
       let cbSeconds = 5;
       let cbInterval = null;
+      let cooldownSeconds = 300;
+      let cooldownInterval = null;
       let holdTimer = null;
       let holdStart = 0;
       let holdAnimFrame = null;
 
+      function escapeHtml(str) {
+        return String(str ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function formatMmSs(totalSec) {
+        const s = Math.max(0, totalSec);
+        const mm = String(Math.floor(s / 60)).padStart(2, "0");
+        const ss = String(s % 60).padStart(2, "0");
+        return `${mm}:${ss}`;
+      }
+
       function clearTimers() {
+        if (launchTransitionTimer) {
+          clearTimeout(launchTransitionTimer);
+          launchTransitionTimer = null;
+        }
         if (cbInterval) {
           clearInterval(cbInterval);
           cbInterval = null;
+        }
+        if (cooldownInterval) {
+          clearInterval(cooldownInterval);
+          cooldownInterval = null;
         }
         if (holdTimer) {
           clearTimeout(holdTimer);
@@ -1691,23 +1792,600 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
         }
       }
 
+      function readBaselineIp() {
+        try {
+          const raw = localStorage.getItem(BASELINE_STORAGE_KEY);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          return parsed && parsed.ip ? parsed : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function saveBaselineIp(exitIp) {
+        if (!exitIp || !exitIp.ip) return;
+        try {
+          localStorage.setItem(BASELINE_STORAGE_KEY, JSON.stringify({
+            ip: exitIp.ip,
+            countryCode: exitIp.countryCode || "",
+            country: exitIp.country || "",
+            asn: exitIp.asn || "",
+            recordedAt: new Date().toISOString()
+          }));
+        } catch {
+          // Ignore storage quota or private-mode restrictions
+        }
+      }
+
+      function getBrowserTimezoneInfo() {
+        const offsetHours = -new Date().getTimezoneOffset() / 60;
+        const absHours = Math.abs(offsetHours);
+        const whole = Math.trunc(absHours);
+        const mins = Math.round((absHours - whole) * 60);
+        const sign = offsetHours >= 0 ? "+" : "-";
+        const utcLabel = mins > 0
+          ? `UTC${sign}${whole}:${String(mins).padStart(2, "0")}`
+          : `UTC${sign}${whole}`;
+        let tzName = utcLabel;
+        try {
+          tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || utcLabel;
+        } catch {
+          // Fallback to UTC offset label
+        }
+        return { offsetHours, utcLabel, tzName };
+      }
+
+      function probeSinglePort(port) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 900);
+        const start = performance.now();
+        return fetch(`http://127.0.0.1:${port}/`, {
+          mode: "no-cors",
+          cache: "no-store",
+          signal: controller.signal
+        }).then(() => {
+          clearTimeout(timer);
+          return {
+            reachable: true,
+            port,
+            latencyMs: Math.max(1, Math.round(performance.now() - start))
+          };
+        }).catch((err) => {
+          clearTimeout(timer);
+          throw err;
+        });
+      }
+
+      function probeLocalProxyPorts() {
+        return Promise.any(COMMON_PROXY_PORTS.map(probeSinglePort))
+          .catch(() => ({ reachable: false, port: null, latencyMs: 0 }));
+      }
+
+      async function fetchTraceUrl(url, source, timeoutMs = 5000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        const start = performance.now();
+        try {
+          const resp = await fetch(url, { cache: "no-store", signal: controller.signal });
+          if (!resp.ok) return null;
+          const text = await resp.text();
+          const latencyMs = Math.max(1, Math.round(performance.now() - start));
+          const map = {};
+          for (const line of text.split(/\r?\n/)) {
+            const idx = line.indexOf("=");
+            if (idx > 0) {
+              map[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+            }
+          }
+          if (!map.ip && !map.loc) return null;
+          return {
+            ip: map.ip || "",
+            loc: (map.loc || "").toUpperCase(),
+            colo: map.colo || "",
+            tls: map.tls || "",
+            latencyMs,
+            source
+          };
+        } catch {
+          return null;
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      async function probeAnthropicTrace() {
+        const primary = await fetchTraceUrl("https://claude.ai/cdn-cgi/trace", "claude.ai trace", 5000);
+        if (primary) return primary;
+        return fetchTraceUrl("https://www.claude.com/cdn-cgi/trace", "claude.com trace", 4500);
+      }
+
+      async function probeGeneralTrace() {
+        const primary = await fetchTraceUrl("https://www.cloudflare.com/cdn-cgi/trace", "cloudflare.com trace", 4500);
+        if (primary) return primary;
+        return fetchTraceUrl("https://1.1.1.1/cdn-cgi/trace", "1.1.1.1 trace", 4000);
+      }
+
+      async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        const start = performance.now();
+        try {
+          const resp = await fetch(url, { cache: "no-store", signal: controller.signal });
+          if (!resp.ok) return null;
+          const data = await resp.json();
+          return {
+            data,
+            latencyMs: Math.max(1, Math.round(performance.now() - start))
+          };
+        } catch {
+          return null;
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      async function probeGeoIp(targetIp, fallbackTrace) {
+        const encoded = targetIp ? encodeURIComponent(targetIp) : "";
+        const fallbackCc = (fallbackTrace && fallbackTrace.loc) ? fallbackTrace.loc.toUpperCase() : "";
+
+        // 1. ipwho.is
+        const res1 = await fetchJsonWithTimeout(`https://ipwho.is/${encoded}`, 4500);
+        if (res1 && res1.data && res1.data.success !== false && res1.data.ip) {
+          const d = res1.data;
+          const conn = d.connection || {};
+          return {
+            ip: d.ip,
+            country: d.country || d.country_code || "",
+            countryCode: (d.country_code || fallbackCc || "").toUpperCase(),
+            region: d.region || "",
+            city: d.city || "",
+            isp: conn.isp || "",
+            org: conn.org || "",
+            asn: conn.asn ? `AS${conn.asn}` : "",
+            isHosting: false,
+            isProxy: false,
+            latencyMs: (fallbackTrace && fallbackTrace.latencyMs) || res1.latencyMs,
+            source: fallbackTrace ? `${fallbackTrace.source} + ipwho.is` : "ipwho.is"
+          };
+        }
+
+        // 2. api.ipapi.is
+        const res2 = await fetchJsonWithTimeout(`https://api.ipapi.is/${encoded ? `?q=${encoded}` : ""}`, 4500);
+        if (res2 && res2.data && res2.data.ip) {
+          const d = res2.data;
+          return {
+            ip: d.ip,
+            country: d.country || "",
+            countryCode: (d.country_code || fallbackCc || "").toUpperCase(),
+            region: d.region || "",
+            city: d.city || "",
+            isp: d.company || "",
+            org: d.asn || "",
+            asn: d.asn || "",
+            isHosting: Boolean(d.is_datacenter || d.is_hosting),
+            isProxy: Boolean(d.is_proxy || d.is_vpn || d.is_tor),
+            latencyMs: (fallbackTrace && fallbackTrace.latencyMs) || res2.latencyMs,
+            source: fallbackTrace ? `${fallbackTrace.source} + ipapi.is` : "api.ipapi.is"
+          };
+        }
+
+        // 3. ipinfo.io
+        const res3 = await fetchJsonWithTimeout(`https://ipinfo.io/${encoded ? `${encoded}/json` : "json"}`, 4500);
+        if (res3 && res3.data && res3.data.ip) {
+          const d = res3.data;
+          const orgStr = d.org || "";
+          const asnToken = orgStr.split(" ")[0] || "";
+          const cc = (d.country || fallbackCc || "").toUpperCase();
+          return {
+            ip: d.ip,
+            country: cc,
+            countryCode: cc,
+            region: d.region || "",
+            city: d.city || "",
+            isp: orgStr,
+            org: orgStr,
+            asn: /^AS\d+/i.test(asnToken) ? asnToken : "",
+            isHosting: false,
+            isProxy: false,
+            latencyMs: (fallbackTrace && fallbackTrace.latencyMs) || res3.latencyMs,
+            source: fallbackTrace ? `${fallbackTrace.source} + ipinfo.io` : "ipinfo.io"
+          };
+        }
+
+        if (fallbackTrace && fallbackTrace.ip) {
+          return {
+            ip: fallbackTrace.ip,
+            country: fallbackCc,
+            countryCode: fallbackCc,
+            region: "",
+            city: "",
+            isp: "",
+            org: "",
+            asn: "",
+            isHosting: false,
+            isProxy: false,
+            latencyMs: fallbackTrace.latencyMs,
+            source: fallbackTrace.source
+          };
+        }
+
+        return null;
+      }
+
+      function evaluateRealReport({ proxyProbe, claudeTrace, generalTrace, exitIp }) {
+        const exitCountry = ((exitIp && exitIp.countryCode) || (claudeTrace && claudeTrace.loc) || (generalTrace && generalTrace.loc) || "").toUpperCase();
+        const rttMs = (exitIp && exitIp.latencyMs) || (claudeTrace && claudeTrace.latencyMs) || (generalTrace && generalTrace.latencyMs) || 0;
+        const issues = [];
+        const capsules = [];
+
+        // 1. 本地代理通道与接管状态
+        if (proxyProbe.reachable && exitCountry && exitCountry !== "CN") {
+          capsules.push({
+            name: "本地代理",
+            val: `${proxyProbe.port} · ${proxyProbe.latencyMs}ms`,
+            level: "safe",
+            tooltip: `检测到本地代理端口 127.0.0.1:${proxyProbe.port} 响应正常（${proxyProbe.latencyMs}ms），且海外出口为 ${exitCountry}。`
+          });
+        } else if (proxyProbe.reachable && exitCountry === "CN") {
+          capsules.push({
+            name: "本地代理",
+            val: `${proxyProbe.port} · 未接管`,
+            level: "danger",
+            tooltip: `检测到本地端口 127.0.0.1:${proxyProbe.port} 在监听，但当前浏览器出口仍为 CN 直连！`
+          });
+          issues.push({
+            level: "danger",
+            title: `本地代理端口 ${proxyProbe.port} 已启动，但浏览器未走代理`,
+            rec: "请在代理软件中开启【系统代理】或【TUN 虚拟网卡模式】后重新检测。"
+          });
+        } else if (claudeTrace || (exitCountry && exitCountry !== "CN")) {
+          capsules.push({
+            name: "本地代理",
+            val: `已接管 · ${rttMs || 1}ms`,
+            level: "safe",
+            tooltip: "未在常见回环端口探测到 HTTP 响应，但当前浏览器出口已处于海外代理 / TUN 接管状态。"
+          });
+        } else {
+          capsules.push({
+            name: "本地代理",
+            val: "未检测到代理",
+            level: "danger",
+            tooltip: "未检测到常见本地代理端口（7890/7897/10808/10809 等），且未能连通海外代理出口。"
+          });
+          issues.push({
+            level: "danger",
+            title: "未检测到可用本地代理或海外通道",
+            rec: "请先启动代理客户端并开启系统代理或 TUN 模式（桌面端 ClaudeSafe 可直接强制接管端口）。"
+          });
+        }
+
+        // 2. 出口 IP 与地区合规检测
+        if (!exitIp || !exitIp.ip || !exitCountry) {
+          capsules.push({
+            name: "出口地区",
+            val: "探测失败",
+            level: "danger",
+            tooltip: "未能从 trace 与 GeoIP 接口获取有效的出口 IP 或国家代码。"
+          });
+          issues.push({
+            level: "danger",
+            title: "出口地区：无法获取当前代理出口 IP",
+            rec: "请检查网络连接或切换代理节点后重试。"
+          });
+        } else if (BLOCKED_COUNTRIES.has(exitCountry)) {
+          capsules.push({
+            name: "出口地区",
+            val: `${exitCountry} · 高危禁区`,
+            level: "danger",
+            tooltip: `当前出口 IP ${exitIp.ip} 位于 ${exitCountry}，属于 Anthropic 受限/封禁地区。`
+          });
+          issues.push({
+            level: "danger",
+            title: `出口地区：检测到受限地区 (${exitCountry} · ${exitIp.ip})`,
+            rec: "请切换至美国 (US)、日本 (JP)、新加坡 (SG) 或台湾 (TW) 等合规节点后重新检测。"
+          });
+        } else {
+          capsules.push({
+            name: "出口地区",
+            val: `${exitCountry} · 合规`,
+            level: "safe",
+            tooltip: `当前出口 ${exitIp.ip} (${exitIp.country || exitCountry}${exitIp.city ? " · " + exitIp.city : ""})，数据源：${exitIp.source}。`
+          });
+        }
+
+        // 3. IP 属性与机房纯净度评估
+        if (!exitIp || !exitIp.ip) {
+          capsules.push({
+            name: "IP 纯净度",
+            val: "未获取",
+            level: "warn",
+            tooltip: "依赖出口 IP 探测结果。"
+          });
+        } else {
+          const combinedMeta = `${exitIp.isp} ${exitIp.org} ${exitIp.asn}`.trim();
+          const matchedKeyword = DATACENTER_KEYWORDS.find(k =>
+            combinedMeta.toLowerCase().includes(k.toLowerCase())
+          );
+          if (exitIp.isHosting || exitIp.isProxy || matchedKeyword) {
+            const detailTag = matchedKeyword ? `命中 ${matchedKeyword}` : (exitIp.isHosting ? "Hosting/IDC" : "Proxy 标记");
+            capsules.push({
+              name: "IP 纯净度",
+              val: "机房节点",
+              level: "warn",
+              tooltip: `${detailTag} · ${combinedMeta || "机房共享 ASN"}`
+            });
+            issues.push({
+              level: "warn",
+              title: `IP 纯净度：疑似机房 / 共享节点 (${detailTag})`,
+              rec: `ASN/ISP：${combinedMeta || "数据中心"}。建议固定单节点使用，避免会话中频繁切换。`
+            });
+          } else {
+            capsules.push({
+              name: "IP 纯净度",
+              val: "较纯净 ISP",
+              level: "safe",
+              tooltip: combinedMeta ? `ISP/ASN：${combinedMeta}` : "未命中常见机房云厂商关键词"
+            });
+          }
+        }
+
+        // 4. 历史 IP 漂移防风控对比
+        const baseline = readBaselineIp();
+        if (!exitIp || !exitIp.ip) {
+          capsules.push({
+            name: "IP 防漂移",
+            val: "无法比对",
+            level: "warn",
+            tooltip: "未获取到当前出口 IP，无法与本地基线比对。"
+          });
+        } else if (!baseline) {
+          capsules.push({
+            name: "IP 防漂移",
+            val: "首次基线",
+            level: "safe",
+            tooltip: `首次在浏览器端检测，通过后将记录 ${exitIp.ip} (${exitCountry || "?"}) 为本地基线。`
+          });
+        } else if (baseline.ip === exitIp.ip) {
+          capsules.push({
+            name: "IP 防漂移",
+            val: "一致 · 无漂移",
+            level: "safe",
+            tooltip: `与上次安全基线 IP ${baseline.ip} (${baseline.countryCode}) 完全一致。`
+          });
+        } else if (baseline.countryCode && exitCountry && baseline.countryCode.toUpperCase() !== exitCountry) {
+          capsules.push({
+            name: "IP 防漂移",
+            val: `${baseline.countryCode}→${exitCountry} 跨国`,
+            level: "warn",
+            tooltip: `上次基线为 ${baseline.ip} (${baseline.countryCode})，当前变为 ${exitIp.ip} (${exitCountry})。`
+          });
+          issues.push({
+            level: "warn",
+            title: `历史 IP 跨国漂移：${baseline.countryCode} → ${exitCountry}`,
+            rec: `上次记录出口为 ${baseline.ip}，短时间跨国跳变易触发风控，建议尽量固定同一国家节点。`
+          });
+        } else {
+          capsules.push({
+            name: "IP 防漂移",
+            val: "同国 IP 变更",
+            level: "warn",
+            tooltip: `上次 ${baseline.ip} → 当前 ${exitIp.ip}（国家保持 ${exitCountry}）。`
+          });
+          issues.push({
+            level: "warn",
+            title: `同国出口 IP 变更 (${exitCountry})`,
+            rec: `上次记录 ${baseline.ip} → 当前 ${exitIp.ip}，建议关闭自动测速/负载均衡并固定节点。`
+          });
+        }
+
+        // 5. Anthropic 连通性与分流防泄漏验证
+        const claudeLoc = (claudeTrace && claudeTrace.loc) ? claudeTrace.loc.toUpperCase() : "";
+        const generalLoc = (generalTrace && generalTrace.loc) ? generalTrace.loc.toUpperCase() : "";
+        if (!claudeTrace) {
+          capsules.push({
+            name: "Anthropic",
+            val: "连接失败",
+            level: "danger",
+            tooltip: "浏览器直发 https://claude.ai/cdn-cgi/trace 失败或超时。"
+          });
+          issues.push({
+            level: "danger",
+            title: "Anthropic 校验：无法连接 claude.ai/cdn-cgi/trace",
+            rec: "当前网络未代理或节点被 Cloudflare 阻断，请开启海外合规代理后重试。"
+          });
+        } else if (BLOCKED_COUNTRIES.has(claudeLoc)) {
+          capsules.push({
+            name: "Anthropic",
+            val: `泄漏 (${claudeLoc})`,
+            level: "danger",
+            tooltip: `实际抵达 claude.ai 的出口国家为受限地区 ${claudeLoc} (${claudeTrace.ip})。`
+          });
+          issues.push({
+            level: "danger",
+            title: `Anthropic 校验：claude.ai 落地为受限地区 (${claudeLoc})`,
+            rec: "存在分流直连泄漏或节点位于禁区，请确保 *.claude.ai 与 *.anthropic.com 走海外合规节点。"
+          });
+        } else if (generalLoc && claudeLoc && generalLoc !== claudeLoc) {
+          capsules.push({
+            name: "Anthropic",
+            val: `${generalLoc}/${claudeLoc} 分流`,
+            level: "warn",
+            tooltip: `常规站点出口为 ${generalLoc}，而 claude.ai 实际落地为 ${claudeLoc} (${claudeTrace.ip})。`
+          });
+          issues.push({
+            level: "warn",
+            title: `分流策略不一致 (常规 ${generalLoc} vs Claude ${claudeLoc})`,
+            rec: "检测到代理规则分流，使用桌面端建议开启 TUN / 全局或将 Claude 与 GeoIP 归入同一策略组。"
+          });
+        } else {
+          capsules.push({
+            name: "Anthropic",
+            val: `畅通 (${claudeLoc || "OK"})`,
+            level: "safe",
+            tooltip: `claude.ai/cdn-cgi/trace 连通正常（落地 ${claudeLoc || "未知"} · ${claudeTrace.latencyMs}ms · ${claudeTrace.tls || "TLS"}）。`
+          });
+        }
+
+        // 6. 系统时区与环境一致性检查
+        const tz = getBrowserTimezoneInfo();
+        if (tz.offsetHours === 8 && exitCountry && !ASIAN_UTC8_9_COUNTRIES.has(exitCountry)) {
+          capsules.push({
+            name: "系统时区",
+            val: "UTC+8 偏差",
+            level: "warn",
+            tooltip: `浏览器系统时区为 ${tz.tzName} (${tz.utcLabel})，与出口国家 ${exitCountry} 存在时区差异。`
+          });
+          issues.push({
+            level: "warn",
+            title: `系统时区偏差：本机 ${tz.utcLabel} vs 出口 ${exitCountry}`,
+            rec: "桌面端作辅助风险提示；若使用网页端或新注册账号，可考虑同步时区或选用亚太合规节点。"
+          });
+        } else {
+          capsules.push({
+            name: "系统时区",
+            val: `${tz.utcLabel} 正常`,
+            level: "safe",
+            tooltip: `本机时区：${tz.tzName} (${tz.utcLabel})。`
+          });
+        }
+
+        const hasDanger = capsules.some(c => c.level === "danger");
+        const hasWarnings = capsules.some(c => c.level === "warn");
+
+        return {
+          checkedAt: new Date(),
+          proxyProbe,
+          claudeTrace,
+          generalTrace,
+          exitIp,
+          exitCountry,
+          rttMs,
+          capsules,
+          issues,
+          canLaunch: !hasDanger,
+          hasWarnings
+        };
+      }
+
+      async function runRealNetworkCheck() {
+        const myId = ++activeCheckId;
+        clearTimers();
+
+        simState = "checking";
+        checkProgress = {
+          proxy: { val: "扫描端口…", level: "warn" },
+          geo: { val: "探测中…", level: "warn" },
+          purity: { val: "等待 IP…", level: "warn" },
+          drift: { val: "等待基线…", level: "warn" },
+          anthropic: { val: "连接中…", level: "warn" },
+          env: { val: `${getBrowserTimezoneInfo().utcLabel}`, level: "safe" }
+        };
+        render();
+
+        const proxyPromise = probeLocalProxyPorts().then(res => {
+          if (myId === activeCheckId && simState === "checking") {
+            checkProgress.proxy = res.reachable
+              ? { val: `${res.port} · ${res.latencyMs}ms`, level: "safe" }
+              : { val: "未监听", level: "warn" };
+            render();
+          }
+          return res;
+        });
+
+        const claudePromise = probeAnthropicTrace().then(res => {
+          if (myId === activeCheckId && simState === "checking") {
+            checkProgress.anthropic = res
+              ? { val: `畅通 (${res.loc || "OK"})`, level: BLOCKED_COUNTRIES.has(res.loc) ? "danger" : "safe" }
+              : { val: "连接失败", level: "danger" };
+            render();
+          }
+          return res;
+        });
+
+        const generalPromise = probeGeneralTrace();
+
+        const [proxyProbe, claudeTrace, generalTrace] = await Promise.all([
+          proxyPromise,
+          claudePromise,
+          generalPromise
+        ]);
+
+        if (myId !== activeCheckId || simState !== "checking") {
+          return;
+        }
+
+        const primaryTrace = claudeTrace || generalTrace;
+        const targetIp = primaryTrace ? primaryTrace.ip : "";
+        checkProgress.geo = { val: targetIp ? `反查 ${targetIp}…` : "查询 GeoIP…", level: "warn" };
+        render();
+
+        const exitIp = await probeGeoIp(targetIp, primaryTrace);
+        if (myId !== activeCheckId || simState !== "checking") {
+          return;
+        }
+
+        const report = evaluateRealReport({ proxyProbe, claudeTrace, generalTrace, exitIp });
+        lastRealReport = report;
+
+        if (!report.canLaunch) {
+          simState = "blocked";
+          render();
+          return;
+        }
+
+        if (report.exitIp) {
+          saveBaselineIp(report.exitIp);
+        }
+
+        simState = "launching";
+        render();
+
+        launchTransitionTimer = setTimeout(() => {
+          launchTransitionTimer = null;
+          if (myId !== activeCheckId || simState !== "launching") return;
+          simState = "running";
+          render();
+        }, 380);
+      }
+
       function renderCapsules(items) {
         return `<div class="wpf-capsules">${items.map(item => `
-          <div class="wpf-capsule ${item.level}">
+          <div class="wpf-capsule ${item.level}" title="${escapeHtml(item.tooltip || `${item.name} · ${item.val}`)}">
             <span class="dot"></span>
-            <span class="name">${item.name}</span>
+            <span class="name">${escapeHtml(item.name)}</span>
             <span class="sep">·</span>
-            <span class="val">${item.val}</span>
+            <span class="val">${escapeHtml(item.val)}</span>
           </div>
         `).join("")}</div>`;
       }
 
-      function logoMarkup(color = "#D97757", angle = 0, progress = 0) {
+      function renderIssueCards(issues) {
+        return `<div class="wpf-issue-list">${issues.map(issue => `
+          <div class="wpf-issue-card ${issue.level === "warn" ? "warn" : ""}">
+            <div class="title">${escapeHtml(issue.title)}</div>
+            <div class="rec">${escapeHtml(issue.rec)}</div>
+          </div>
+        `).join("")}</div>`;
+      }
+
+      function formatExitIpText(report) {
+        if (report && report.exitIp && report.exitIp.ip) {
+          const cc = report.exitCountry || report.exitIp.countryCode || "??";
+          return `🌐 ${report.exitIp.ip} · ${cc} (${report.rttMs || report.exitIp.latencyMs || 1}ms)`;
+        }
+        return "🌐 未检测到可用海外代理出口";
+      }
+
+      function logoMarkup(color = "#D97757", angle = 0, progress = 0, allowHoldUnlock = false) {
         const radius = 29;
         const circumference = 2 * Math.PI * radius;
         const offset = circumference * (1 - progress);
+        const titleAttr = allowHoldUnlock
+          ? ' title="未启动时：长按 1 秒临时解锁（用于启动 Claude 3P 模式）"'
+          : "";
         return `
-          <div class="wpf-logo-box" id="simLogoBox" title="未启动时：长按 1 秒临时解锁（用于启动 Claude 3P 模式）">
+          <div class="wpf-logo-box" id="simLogoBox"${titleAttr} style="${allowHoldUnlock ? "" : "cursor:default;"}">
             <svg class="wpf-logo-ring" viewBox="0 0 62 62">
               <circle cx="31" cy="31" r="${radius}" fill="none" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"
                 stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
@@ -1720,13 +2398,14 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
         `;
       }
 
-      function titleBarMarkup(dotColor = "#D97757", adminLabel = "已开启内核级禁直连") {
+      function titleBarMarkup(dotColor = "#D97757", adminLabel = "标准守护 · 点此开启禁直连", adminTone = "") {
+        const badgeClass = adminTone ? `wpf-admin-mini ${adminTone}` : "wpf-admin-mini";
         return `
           <div class="wpf-titlebar">
             <div class="wpf-title-left">
               <span class="wpf-dot" style="background:${dotColor};"></span>
               <span>ClaudeSafe</span>
-              <span class="wpf-admin-mini">${adminLabel}</span>
+              <span class="${badgeClass}">${escapeHtml(adminLabel)}</span>
             </div>
             <div class="wpf-title-btns">
               <span class="wpf-title-btn" aria-hidden="true">—</span>
@@ -1736,98 +2415,79 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
         `;
       }
 
+      function attachLogoHoldHandler(logoBox) {
+        if (!logoBox) return;
+        const startHold = (e) => {
+          if (simState !== "locked" && simState !== "blocked") return;
+          e.preventDefault();
+          holdStart = performance.now();
+          const circle = logoBox.querySelector("circle");
+          const svg = logoBox.querySelector(".wpf-logo-svg");
+          const circumference = 2 * Math.PI * 29;
+
+          const step = (now) => {
+            const elapsed = now - holdStart;
+            const p = Math.min(1, elapsed / 1000);
+            if (circle) {
+              circle.style.opacity = "1";
+              circle.style.strokeDashoffset = String(circumference * (1 - p));
+            }
+            if (svg) {
+              svg.style.transform = `rotate(${p * 360}deg)`;
+            }
+            if (p < 1) {
+              holdAnimFrame = requestAnimationFrame(step);
+            } else {
+              simState = "unlocked3p";
+              render();
+            }
+          };
+          holdAnimFrame = requestAnimationFrame(step);
+        };
+
+        const cancelHold = () => {
+          if (holdAnimFrame) {
+            cancelAnimationFrame(holdAnimFrame);
+            holdAnimFrame = null;
+          }
+          const circle = logoBox.querySelector("circle");
+          const svg = logoBox.querySelector(".wpf-logo-svg");
+          if (circle) circle.style.opacity = "0";
+          if (svg && simState !== "unlocked3p") svg.style.transform = "rotate(0deg)";
+        };
+
+        logoBox.addEventListener("mousedown", startHold);
+        logoBox.addEventListener("touchstart", startHold, { passive: false });
+        logoBox.addEventListener("mouseup", cancelHold);
+        logoBox.addEventListener("mouseleave", cancelHold);
+        logoBox.addEventListener("touchend", cancelHold);
+      }
+
+      function updateExternalControls() {
+        if (extResetSimBtn) {
+          extResetSimBtn.hidden = (simState === "locked" && !lastRealReport);
+        }
+      }
+
       function render() {
         clearTimers();
+        updateExternalControls();
 
-        if (currentTab === "safe") {
-          hintBar.textContent = "演示状态：6 维体检通过，GatekeeperProxyServer (127.0.0.1:17890) 已放行并守护运行中的 Claude Desktop。";
-          host.innerHTML = `
-            <div class="wpf-window">
-              ${titleBarMarkup("#18794E", "标准守护 · 已放行")}
-              <div class="wpf-hero-top">
-                ${logoMarkup("#18794E", 0, 0)}
-                <div class="wpf-main-status" style="color:#18794E;">安全守护中 · 守门代理已放行</div>
-                <div class="wpf-pills-row">
-                  <span class="wpf-ip-pill">🌐 出口 IP：US · 198.51.100.42 (原生 ISP)</span>
-                </div>
-              </div>
-              <div class="wpf-mid-card">
-                ${renderCapsules(SAFE_PILLS)}
-                <div class="wpf-summary-box">
-                  全部高危项检测通过，<code>GatekeeperProxyServer</code> 正在 <code>127.0.0.1:17890</code> 接管流量（3s 端口 / 15s IP 巡检中）。
-                </div>
-              </div>
-              <div class="wpf-footer">
-                <button class="wpf-primary-btn danger" type="button" onclick="window.__simSwitch('breaker')">
-                  退出 Claude 并封锁所有流量（点此演练熔断）
-                </button>
-                <div class="wpf-bottom-row">
-                  <span>看门狗：运行中 · 端口 17890</span>
-                  <span class="wpf-settings-chip">⚙ 守门与防泄漏设置</span>
-                </div>
-              </div>
-            </div>
-          `;
-          return;
-        }
-
-        if (currentTab === "danger") {
-          hintBar.textContent = "演示状态：检测到 HK 封禁出口与 claude.ai/cdn-cgi/trace 直连泄漏，守门代理保持锁死并严禁启动。";
-          host.innerHTML = `
-            <div class="wpf-window">
-              ${titleBarMarkup("#C93B2B", "高危阻断 · 阀门锁死")}
-              <div class="wpf-hero-top">
-                ${logoMarkup("#C93B2B", 0, 0)}
-                <div class="wpf-main-status" style="color:#C93B2B;">❌ 检测到高危风险 · 已阻止启动</div>
-                <div class="wpf-pills-row">
-                  <span class="wpf-ip-pill" style="background:#FEF2F2;border-color:#FECACA;color:#C93B2B;">
-                    ⚠️ 出口 IP：HK · 203.0.113.88 (高危受限区)
-                  </span>
-                </div>
-              </div>
-              <div class="wpf-mid-card">
-                ${renderCapsules(DANGER_PILLS)}
-                <div class="wpf-issue-list">
-                  <div class="wpf-issue-card">
-                    <div class="title">出口地区：检测到受限地区 (HK)</div>
-                    <div class="rec">请切换至美国 / 日本 / 新加坡等合规节点后重新体检。</div>
-                  </div>
-                  <div class="wpf-issue-card">
-                    <div class="title">Anthropic 校验：claude.ai 分流走 DIRECT 泄漏</div>
-                    <div class="rec">请在代理规则中将 claude.ai 与 anthropic.com 强制走代理通道。</div>
-                  </div>
-                </div>
-              </div>
-              <div class="wpf-footer">
-                <button class="wpf-primary-btn" type="button" onclick="window.__simSwitch('idle')">
-                  重新检测网络状态
-                </button>
-                <div class="wpf-bottom-row">
-                  <span>守门阀门：LOCKED (禁止外连)</span>
-                  <span class="wpf-settings-chip">⚙ 守门与防泄漏设置</span>
-                </div>
-              </div>
-            </div>
-          `;
-          return;
-        }
-
-        if (currentTab === "breaker") {
+        if (simState === "breaker") {
           if (cbState === "countdown") {
-            hintBar.textContent = "演示状态：模拟运行期 VPN 掉线，0ms 切断 TCP 连接并置顶弹出 CircuitBreakerWindow。";
-          } else if (cbState === "cooldown") {
-            hintBar.textContent = "演示状态：已选择保持断网进入 5 分钟冷静期，保留 Claude 对话现场等待 VPN 恢复。";
+            hintBar.textContent = "外部熔断测试：模拟运行期 VPN 掉线，0ms 切断 TCP 并置顶弹出 CircuitBreakerWindow。";
           } else {
-            hintBar.textContent = "演示状态：已强杀全部 Claude 进程树并启用常态防裸连封锁。";
+            hintBar.textContent = "外部熔断测试：已强杀全部 Claude 进程树并恢复常态防裸连封锁。";
           }
 
           const subline = cbState === "countdown"
             ? `已立即切断网络连接 · <strong id="cbSec">${cbSeconds}</strong> 秒后将自动退出 Claude`
-            : cbState === "cooldown"
-              ? "已锁定所有代理流量 · 正在等待 VPN 修复（5 分钟冷静期）"
-              : "已彻底终止 Claude 进程树 · 常态封锁已就绪";
+            : "已彻底终止 Claude 进程树 · 常态封锁已就绪";
 
           const currentStatus = cbState === "killed" ? "已强杀清理进程" : "代理断开 · TCP 已强断";
+          const safeIpDisplay = (lastRealReport && lastRealReport.canLaunch && lastRealReport.exitIp && lastRealReport.exitIp.ip)
+            ? `${lastRealReport.exitCountry || "OK"} · ${lastRealReport.exitIp.ip}`
+            : "US · 198.51.100.42";
 
           host.innerHTML = `
             <div class="wpf-window breaker-mode">
@@ -1842,14 +2502,14 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
 
                 <div class="cb-reason-card">
                   <div class="cb-reason-label">异常原因</div>
-                  <div class="cb-reason-text">本地代理 127.0.0.1:7890 连接断开，已第 0 毫秒锁死 GatekeeperProxyServer</div>
+                  <div class="cb-reason-text">【模拟演练】检测到上游代理意外断开 / 出口 IP 回落境内，已第 0 毫秒锁死 GatekeeperProxyServer</div>
                 </div>
 
                 <div class="cb-compare-card">
                   <div class="cb-ip-grid">
                     <div>
                       <div class="cb-ip-label">原安全 IP</div>
-                      <div class="cb-ip-val safe">US · 198.51.100.42</div>
+                      <div class="cb-ip-val safe">${escapeHtml(safeIpDisplay)}</div>
                     </div>
                     <div>
                       <div class="cb-ip-label">当前状态 / 已切断</div>
@@ -1857,18 +2517,18 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
                     </div>
                   </div>
                   <div class="cb-desc">
-                    • 点击【立即退出】：立刻强杀并退出 Claude Desktop。<br/>
+                    • 点击【立即退出并强杀】：立刻强杀并退出 Claude Desktop。<br/>
                     • 点击【取消】：保持断网并进入 5 分钟熔断保护，网络恢复后将自动重连并发送系统通知。
                   </div>
                 </div>
               </div>
 
               <div class="cb-actions">
-                <button class="cb-btn-sec" type="button" id="cbCooldownBtn">
-                  ${cbState === "cooldown" ? "⏳ 冷静期保护中 (04:58)" : "取消（熔断保护 5 分钟）"}
+                <button class="cb-btn-sec" type="button" id="cbCooldownBtn" ${cbState === "killed" ? "disabled" : ""}>
+                  取消（熔断保护 5 分钟）
                 </button>
                 <button class="cb-btn-kill" type="button" id="cbKillBtn">
-                  ${cbState === "killed" ? "重置紧急熔断演示" : "立即退出并强杀"}
+                  ${cbState === "killed" ? "返回待启动状态" : "立即退出并强杀"}
                 </button>
               </div>
             </div>
@@ -1889,14 +2549,16 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
           }
 
           document.getElementById("cbCooldownBtn").addEventListener("click", () => {
-            cbState = "cooldown";
+            if (cbState === "killed") return;
+            simState = "cooldown";
+            cooldownSeconds = 300;
             render();
           });
 
           document.getElementById("cbKillBtn").addEventListener("click", () => {
             if (cbState === "killed") {
-              cbState = "countdown";
-              cbSeconds = 5;
+              lastRealReport = null;
+              simState = "locked";
             } else {
               cbState = "killed";
             }
@@ -1905,170 +2567,249 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
           return;
         }
 
-        // Tab 4: idle & interactive 3P hold-unlock
-        hintBar.textContent = "交互玩法：点击主按钮模拟 6 维体检过程；或按住上方星芒 Logo 1 秒，体验旋转解锁 3P 模式！";
+        if (simState === "cooldown") {
+          hintBar.textContent = "已进入 5 分钟冷静期保护：保持断网并保留对话现场，修复代理后点击「重新检测并恢复连接」即可恢复。";
+          const midCooldownHtml = lastRealReport && lastRealReport.capsules
+            ? renderCapsules(lastRealReport.capsules) + `<div class="wpf-summary-box">已锁定所有代理流量并保留 Claude 对话现场。修复代理节点后，点击下方按钮重新检测即可无损恢复连接。</div>`
+            : `<div class="wpf-empty-hint"><span style="font-size:22px;">⏳</span><span>已锁定所有代理流量并保留 Claude 对话现场。<br/>请先修复本地代理节点，然后点击下方「重新检测并恢复连接」。</span></div>`;
+
+          host.innerHTML = `
+            <div class="wpf-window">
+              ${titleBarMarkup("#D97706", "熔断冷静期 · 阀门锁死")}
+              <div class="wpf-hero-top">
+                ${logoMarkup("#D97757", 0, 0, false)}
+                <div class="wpf-main-status" style="color:#D97706;">5 分钟冷静期锁定中</div>
+                <div class="wpf-pills-row">
+                  <span class="wpf-ip-pill danger">⚡ 代理断开 · 流量已锁定</span>
+                  <span class="wpf-cooldown-pill" id="cooldownTimerText">⏳ ${formatMmSs(cooldownSeconds)}</span>
+                </div>
+              </div>
+              <div class="wpf-mid-card">${midCooldownHtml}</div>
+              <div class="wpf-footer">
+                <button class="wpf-primary-btn" type="button" id="cooldownRecoverBtn">重新检测并恢复连接</button>
+                <button class="wpf-secondary-kill-btn" type="button" id="cooldownKillBtn">封锁并立即退出 Claude</button>
+                <div class="wpf-bottom-row">
+                  <span>⏳ 保持断网等待修复 · 关窗后台守护</span>
+                  <span class="wpf-settings-chip">⚙ 设置</span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          cooldownInterval = setInterval(() => {
+            cooldownSeconds -= 1;
+            const el = document.getElementById("cooldownTimerText");
+            if (el) el.textContent = `⏳ ${formatMmSs(cooldownSeconds)}`;
+            if (cooldownSeconds <= 0) {
+              clearInterval(cooldownInterval);
+              cooldownInterval = null;
+              lastRealReport = null;
+              simState = "locked";
+              render();
+            }
+          }, 1000);
+
+          document.getElementById("cooldownRecoverBtn").addEventListener("click", () => runRealNetworkCheck());
+          document.getElementById("cooldownKillBtn").addEventListener("click", () => {
+            lastRealReport = null;
+            simState = "locked";
+            render();
+          });
+          return;
+        }
+
+        // MainWindow normal lifecycle states: locked | checking | launching | running | blocked | unlocked3p
+        let adminLabel = "标准守护 · 点此开启禁直连";
+        let adminTone = "";
         let statusTitle = "已开启流量封锁 · 待安全启动";
+        let statusColor = "#141413";
         let ipText = "🌐 出口 IP：点击下方按钮开始检测";
+        let ipPillClass = "wpf-ip-pill";
+        let showRecheckChip = false;
         let dotColor = "#D97757";
         let logoColor = "#D97757";
         let logoAngle = 0;
+        let allowHoldUnlock = true;
         let midHtml = `
           <div class="wpf-empty-hint">
             <span style="font-size:22px;">🛡️</span>
-            <span>点击下方按钮后，将在此显示代理通道、出口合规与防直连状态。</span>
+            <span>点击下方按钮后，将实时检测您当前的代理端口、真实出口 IP、地区合规与 claude.ai 连通性。</span>
           </div>
         `;
         let btnText = "检测网络并安全启动";
         let btnClass = "wpf-primary-btn";
         let btnDisabled = "";
+        let footerLeftText = "长按 Logo 1 秒解锁 3P 模式 · 关窗后台守护";
 
-        if (idleSubState === "checking") {
-          statusTitle = "正在执行 6 维网络与风控体检…";
-          ipText = "🔍 并发探测代理端口与 claude.ai/cdn-cgi/trace";
+        if (simState === "locked") {
+          hintBar.textContent = "提示：点击「检测网络并安全启动」将真实探测出口 IP 与 claude.ai 连通性；通过后自动进入「受控安全运行中」，长按 Logo 1 秒可解锁 3P 模式。";
+        } else if (simState === "checking") {
+          allowHoldUnlock = false;
+          const p = checkProgress || {
+            proxy: { val: "扫描端口…", level: "warn" },
+            geo: { val: "探测中…", level: "warn" },
+            purity: { val: "等待 IP…", level: "warn" },
+            drift: { val: "等待基线…", level: "warn" },
+            anthropic: { val: "连接中…", level: "warn" },
+            env: { val: "确认中…", level: "warn" }
+          };
+          hintBar.textContent = "正在执行真实 6 维网络探测：并发扫描本地代理端口、请求 claude.ai/cdn-cgi/trace 与 GeoIP 数据库…";
+          statusTitle = "正在检测网络与风险项…";
+          ipText = "🔍 并发探测本地代理、claude.ai 与 GeoIP 出口";
           midHtml = renderCapsules([
-            { name: "本地代理", val: "7890 · 18ms", level: "safe" },
-            { name: "出口地区", val: "US · 合规", level: "safe" },
-            { name: "IP 纯净度", val: "探测中…", level: "warn" },
-            { name: "历史漂移", val: "对比中…", level: "warn" },
-            { name: "Anthropic", val: "校验中…", level: "warn" },
-            { name: "系统时区", val: "待确认", level: "warn" }
-          ]) + `<div class="wpf-summary-box">正在交叉验证 GeoIP 与分流防泄漏规则，请稍候…</div>`;
-          btnText = "正在体检中…";
+            { name: "本地代理", val: p.proxy.val, level: p.proxy.level },
+            { name: "出口地区", val: p.geo.val, level: p.geo.level },
+            { name: "IP 纯净度", val: p.purity.val, level: p.purity.level },
+            { name: "IP 防漂移", val: p.drift.val, level: p.drift.level },
+            { name: "Anthropic", val: p.anthropic.val, level: p.anthropic.level },
+            { name: "系统时区", val: p.env.val, level: p.env.level }
+          ]) + `<div class="wpf-summary-box">正在交叉验证真实出口归属地与分流防泄漏规则，请稍候…</div>`;
+          btnText = "正在检测网络并准备启动…";
           btnDisabled = "disabled";
-        } else if (idleSubState === "checked") {
+          footerLeftText = "🛡️ 正在执行真实浏览器侧 6 维网络检测…";
+        } else if (simState === "launching" && lastRealReport) {
+          allowHoldUnlock = false;
+          const r = lastRealReport;
           dotColor = "#18794E";
           logoColor = "#18794E";
-          statusTitle = "体检通过 · 允许安全启动 Claude";
-          ipText = "🌐 出口 IP：US · 198.51.100.42 (原生 ISP)";
-          midHtml = renderCapsules(SAFE_PILLS) + `<div class="wpf-summary-box">全部 6 项检测均已通过！守门代理已就绪，点击下方按钮启动。</div>`;
-          btnText = "通过守门代理启动 Claude Desktop";
+          adminLabel = "体检通过 · 正在放行";
+          adminTone = "safe";
+          statusTitle = r.hasWarnings ? "检测通过（含风险提醒）· 正在启动" : "网络环境安全 · 正在启动 Claude…";
+          statusColor = "#18794E";
+          ipText = formatExitIpText(r);
+          ipPillClass = "wpf-ip-pill safe";
+          midHtml = r.issues.length > 0
+            ? renderCapsules(r.capsules) + renderIssueCards(r.issues)
+            : renderCapsules(r.capsules) + `<div class="wpf-summary-box">全部 6 项真实检测均安全通过！正在激活 <code>GatekeeperProxyServer</code> 并拉起受控运行态…</div>`;
+          btnText = "安全通过 · 正在启动 Claude…";
           btnClass = "wpf-primary-btn safe";
-        } else if (idleSubState === "unlocked3p") {
+          btnDisabled = "disabled";
+          footerLeftText = "🛡️ 正在激活守门代理并启动 Claude Desktop…";
+          hintBar.textContent = "真实检测安全通过！正在通过 GatekeeperProxyServer 放行流量并进入受控安全运行中…";
+        } else if (simState === "running" && lastRealReport) {
+          allowHoldUnlock = false;
+          showRecheckChip = true;
+          const r = lastRealReport;
+          dotColor = "#18794E";
+          logoColor = "#18794E";
+          adminLabel = "标准守护 · 已放行";
+          adminTone = "safe";
+          statusTitle = "Claude 受控安全运行中";
+          statusColor = "#18794E";
+          ipText = formatExitIpText(r);
+          ipPillClass = "wpf-ip-pill safe";
+          midHtml = r.issues.length > 0
+            ? renderCapsules(r.capsules) + renderIssueCards(r.issues)
+            : renderCapsules(r.capsules) + `<div class="wpf-summary-box">全部高危项检测通过，<code>GatekeeperProxyServer</code> 正在 <code>127.0.0.1:17890</code> 接管流量（3s 端口 / 15s IP 巡检中）。</div>`;
+          btnText = "封锁并安全退出";
+          btnClass = "wpf-primary-btn danger";
+          footerLeftText = "🛡️ 运行期断流熔断守护中 · 悬停胶囊看详情";
+          hintBar.textContent = r.hasWarnings
+            ? "已进入「受控安全运行中」（含黄色风控提醒）：守门代理已放行并持续巡检。可点击下方外部按钮测试断流熔断机制。"
+            : "已进入「受控安全运行中」：全部 6 项真实检测安全通过，守门代理已放行。可点击下方外部按钮测试断流熔断机制。";
+        } else if (simState === "blocked" && lastRealReport) {
+          showRecheckChip = true;
+          const r = lastRealReport;
+          dotColor = "#C93B2B";
+          logoColor = "#C93B2B";
+          adminLabel = "高危阻断 · 阀门锁死";
+          adminTone = "danger";
+          statusTitle = "❌ 检测到高危风险 · 已阻止启动";
+          statusColor = "#C93B2B";
+          ipText = formatExitIpText(r);
+          ipPillClass = "wpf-ip-pill danger";
+          midHtml = renderCapsules(r.capsules) + renderIssueCards(r.issues);
+          btnText = "重新检测网络并安全启动";
+          btnClass = "wpf-primary-btn";
+          footerLeftText = "守门阀门：LOCKED · 长按 Logo 1 秒可解锁 3P";
+          hintBar.textContent = "真实检测发现高危阻断项（红色卡片），已阻止启动。切换代理节点后可点击按钮重新真实检测。";
+        } else if (simState === "unlocked3p") {
+          allowHoldUnlock = false;
           dotColor = "#B45309";
           logoColor = "#B45309";
           logoAngle = 360;
-          statusTitle = "已临时解锁 · 3P 模式自由启动";
+          adminLabel = "3P 临时解锁中";
+          statusTitle = "已临时解锁 · 3P 自由启动模式";
+          statusColor = "#B45309";
           ipText = "🔓 看门狗已暂挂（重启或复锁后恢复）";
+          ipPillClass = "wpf-ip-pill warn";
           midHtml = `
             <div class="wpf-empty-hint">
               <span style="font-size:22px;">✨</span>
               <span style="color:#B45309;font-weight:600;">已通过长按星芒 Logo 1 秒临时解锁，允许直接启动 Claude 3P 模式，看门狗暂不拦截。</span>
             </div>
           `;
-          btnText = "恢复常态安全封锁";
+          btnText = "重新上锁并恢复封锁";
+          btnClass = "wpf-primary-btn danger";
+          footerLeftText = "🔓 已暂时放行 3P 模式 · 完成后请点上方恢复封锁";
+          hintBar.textContent = "已触发长按星芒 Logo 1 秒旋转解锁 3P 模式，点击底部按钮可恢复常态安全封锁。";
         }
 
         host.innerHTML = `
           <div class="wpf-window">
-            ${titleBarMarkup(dotColor, idleSubState === "unlocked3p" ? "3P 临时解锁中" : "标准守护 · 点此开启禁直连")}
+            ${titleBarMarkup(dotColor, adminLabel, adminTone)}
             <div class="wpf-hero-top">
-              ${logoMarkup(logoColor, logoAngle, 0)}
-              <div class="wpf-main-status">${statusTitle}</div>
+              ${logoMarkup(logoColor, logoAngle, 0, allowHoldUnlock)}
+              <div class="wpf-main-status" style="color:${statusColor};">${statusTitle}</div>
               <div class="wpf-pills-row">
-                <span class="wpf-ip-pill">${ipText}</span>
+                <span class="${ipPillClass}">${escapeHtml(ipText)}</span>
+                ${showRecheckChip ? `<button class="wpf-recheck-chip" type="button" id="idleRecheckChip" title="重新执行真实 6 维网络检测">🔄 重新检测</button>` : ""}
               </div>
             </div>
             <div class="wpf-mid-card">${midHtml}</div>
             <div class="wpf-footer">
               <button class="${btnClass}" type="button" id="idlePrimaryBtn" ${btnDisabled}>${btnText}</button>
               <div class="wpf-bottom-row">
-                <span>提示：长按上方星芒 Logo 1 秒可临时解锁</span>
+                <span>${escapeHtml(footerLeftText)}</span>
                 <span class="wpf-settings-chip">⚙ 设置</span>
               </div>
             </div>
           </div>
         `;
 
+        const recheckChip = document.getElementById("idleRecheckChip");
+        if (recheckChip) {
+          recheckChip.addEventListener("click", () => runRealNetworkCheck());
+        }
+
         const idleBtn = document.getElementById("idlePrimaryBtn");
         if (idleBtn) {
           idleBtn.addEventListener("click", () => {
-            if (idleSubState === "locked") {
-              idleSubState = "checking";
-              render();
-              setTimeout(() => {
-                if (currentTab === "idle" && idleSubState === "checking") {
-                  idleSubState = "checked";
-                  render();
-                }
-              }, 900);
-            } else if (idleSubState === "checked") {
-              window.__simSwitch("safe");
-            } else if (idleSubState === "unlocked3p") {
-              idleSubState = "locked";
+            if (simState === "locked" || simState === "blocked") {
+              runRealNetworkCheck();
+            } else if (simState === "running" || simState === "unlocked3p") {
+              lastRealReport = null;
+              simState = "locked";
               render();
             }
           });
         }
 
-        const logoBox = document.getElementById("simLogoBox");
-        if (logoBox) {
-          const startHold = (e) => {
-            if (idleSubState === "checking") return;
-            e.preventDefault();
-            holdStart = performance.now();
-            const circle = logoBox.querySelector("circle");
-            const svg = logoBox.querySelector(".wpf-logo-svg");
-            const circumference = 2 * Math.PI * 29;
-
-            const step = (now) => {
-              const elapsed = now - holdStart;
-              const p = Math.min(1, elapsed / 1000);
-              if (circle) {
-                circle.style.opacity = "1";
-                circle.style.strokeDashoffset = String(circumference * (1 - p));
-              }
-              if (svg) {
-                svg.style.transform = `rotate(${p * 360}deg)`;
-              }
-              if (p < 1) {
-                holdAnimFrame = requestAnimationFrame(step);
-              } else {
-                idleSubState = idleSubState === "unlocked3p" ? "locked" : "unlocked3p";
-                render();
-              }
-            };
-            holdAnimFrame = requestAnimationFrame(step);
-          };
-
-          const cancelHold = () => {
-            if (holdAnimFrame) {
-              cancelAnimationFrame(holdAnimFrame);
-              holdAnimFrame = null;
-            }
-            const circle = logoBox.querySelector("circle");
-            const svg = logoBox.querySelector(".wpf-logo-svg");
-            if (circle) circle.style.opacity = "0";
-            if (svg && idleSubState !== "unlocked3p") svg.style.transform = "rotate(0deg)";
-          };
-
-          logoBox.addEventListener("mousedown", startHold);
-          logoBox.addEventListener("touchstart", startHold, { passive: false });
-          logoBox.addEventListener("mouseup", cancelHold);
-          logoBox.addEventListener("mouseleave", cancelHold);
-          logoBox.addEventListener("touchend", cancelHold);
+        if (allowHoldUnlock) {
+          attachLogoHoldHandler(document.getElementById("simLogoBox"));
         }
       }
 
-      window.__simSwitch = function (tab) {
-        currentTab = tab;
-        if (tab === "breaker") {
+      if (extTestBreakerBtn) {
+        extTestBreakerBtn.addEventListener("click", () => {
+          activeCheckId += 1;
+          clearTimers();
+          simState = "breaker";
           cbState = "countdown";
           cbSeconds = 5;
-        }
-        if (tab === "idle") {
-          idleSubState = "locked";
-        }
-        tabBtns.forEach(btn => {
-          const active = btn.dataset.tab === tab;
-          btn.classList.toggle("active", active);
-          btn.setAttribute("aria-selected", active ? "true" : "false");
+          render();
         });
-        render();
-      };
+      }
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener("click", () => window.__simSwitch(btn.dataset.tab));
-      });
+      if (extResetSimBtn) {
+        extResetSimBtn.addEventListener("click", () => {
+          activeCheckId += 1;
+          clearTimers();
+          lastRealReport = null;
+          simState = "locked";
+          render();
+        });
+      }
 
       // Copy SHA256 buttons
       document.querySelectorAll(".copy-btn").forEach(btn => {

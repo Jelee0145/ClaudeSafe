@@ -109,7 +109,7 @@ public sealed class SystemProxyService
                         key.DeleteValue("AutoConfigURL", throwOnMissingValue: false);
                 }
 
-                NotifyWinInetChanged();
+                NotifyWinInetChanged(synchronous: true);
                 TryDeleteBackupFile();
                 _backup = null;
                 return (true, "已恢复退出前的 Windows 系统代理设置");
@@ -185,28 +185,42 @@ public sealed class SystemProxyService
 
     private static bool PointsToGatekeeper(string? value, int gatekeeperPort)
     {
-        if (string.IsNullOrWhiteSpace(value) || gatekeeperPort <= 0)
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        if (value.Contains("/pac.js?state=", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (gatekeeperPort <= 0)
             return false;
 
         return value.Contains($"127.0.0.1:{gatekeeperPort}", StringComparison.OrdinalIgnoreCase) ||
                value.Contains($"localhost:{gatekeeperPort}", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void NotifyWinInetChanged()
+    private static void NotifyWinInetChanged(bool synchronous = false)
     {
-        // 在后台触发 WinInet 刷新通知，避免阻塞 WPF UI 线程
-        System.Threading.Tasks.Task.Run(() =>
+        if (synchronous)
         {
-            try
-            {
-                InternetSetOption(IntPtr.Zero, InternetOptionSettingsChanged, IntPtr.Zero, 0);
-                InternetSetOption(IntPtr.Zero, InternetOptionRefresh, IntPtr.Zero, 0);
-            }
-            catch
-            {
-                // Ignore WinInet refresh errors
-            }
-        });
+            InvokeWinInetRefresh();
+            return;
+        }
+
+        // 在后台触发 WinInet 刷新通知，避免阻塞 WPF UI 线程
+        System.Threading.Tasks.Task.Run(InvokeWinInetRefresh);
+    }
+
+    private static void InvokeWinInetRefresh()
+    {
+        try
+        {
+            InternetSetOption(IntPtr.Zero, InternetOptionSettingsChanged, IntPtr.Zero, 0);
+            InternetSetOption(IntPtr.Zero, InternetOptionRefresh, IntPtr.Zero, 0);
+        }
+        catch
+        {
+            // Ignore WinInet refresh errors
+        }
     }
 
     private ProxyBackupState? TryLoadBackupFile()

@@ -3,14 +3,14 @@
 ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Claude Desktop 安全启动器、本地守门代理与运行期断流熔断助手**（基于 .NET 8 WPF，零第三方运行库依赖）。
 
 > 🌐 **项目主页 (Home)**：https://ccsafe.lyzi.cloud  
-> 📦 **最新版本下载**：[GitHub Releases (v1.0.0)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.0)
+> 📦 **最新版本下载**：[GitHub Releases (v1.0.1)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.1)
 
-## 快速下载 (v1.0.0)
+## 快速下载 (v1.0.1)
 
 | 版本 | 说明 | 下载链接 | SHA256 |
 | --- | --- | --- | --- |
-| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 68.4 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.0-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-x64-standalone.exe) | `2CED4E0BD23E11AE6A01D3F3E481252BB7688C39E5213E5870D4A9AFF70EBC74` |
-| **精简框架依赖版** | 轻量压缩包（约 147.6 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.0-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.0/ClaudeSafe-v1.0.0-win-framework-dependent.zip) | `2B6EE718FC27C3C526E7FD7CECD7E2FDFC4181919CC598DA1951103782E92049` |
+| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.4 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.1-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-x64-standalone.exe) | `1D55FE4F0B56A3EEE5C8C8DEC9E4F001E12273568FD4809230BB446693B0116C` |
+| **精简框架依赖版** | 轻量压缩包（约 150.3 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.1-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.1/ClaudeSafe-v1.0.1-win-framework-dependent.zip) | `B1E2FCC16D717DA33059C2E8ED4204C19F65BFEDA4AEB1514238F9C6A05B1FF8` |
 
 ## 核心安全机制
 
@@ -32,9 +32,9 @@ ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Cla
      - **锁定网络并进入 5 分钟冷静期**：保持 100% 断网状态并开启 5 分钟倒计时供您修复 VPN，修复后点击【重新体检并恢复连接】即可恢复通信；超时未恢复则自动强杀。
      - **立即退出并强杀所有 Claude 进程**：立刻终止全部进程树并锁定网络。
 
-4. **退出自动清理与防裸连常态封锁**
-   - 检测到 Claude Desktop 退出或点击【退出 Claude 并封锁所有流量】时，先切断守门阀门并启用 Windows 防火墙出站规则与 Hosts 域名黑洞封锁（需管理员权限，标准权限下由守门代理+进程看门狗提供拦截），再彻底清理全部 `claude.exe` / `claude-desktop-msstore.exe` / `Update.exe` 进程树。
-   - 常态封锁下若直接双击打开未经体检的 Claude Desktop，看门狗将自动拦截并清理，防止误触裸连。
+4. **退出无痕还原与防裸连常态封锁**
+   - 后台驻留守护期间，检测到 Claude Desktop 退出或点击【封锁并安全退出】时，会立即锁死守门阀门并启用 Windows 防火墙出站规则与 Hosts 域名黑洞封锁（需管理员权限），同时拦截未经体检的直接双击启动，防止误触裸连。
+   - 彻底退出 ClaudeSafe 时，会先检测 Claude Desktop 是否正在运行并弹窗确认是否同步退出，随后停止看门狗并**无痕还原**全部 Windows 系统代理 / PAC、防火墙规则与 Hosts 设置（支持 `--clean-all` 手动兜底清理）。
 
 ## 构建与运行
 
