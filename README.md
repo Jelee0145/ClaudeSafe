@@ -9,8 +9,8 @@ ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Cla
 
 | 版本 | 说明 | 下载链接 | SHA256 |
 | --- | --- | --- | --- |
-| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.6 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.2-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe) | `D4807E27443B492E112A3924DE99C77390E65E290BEDABB69EC5F3C88EE27332` |
-| **精简框架依赖版** | 轻量压缩包（约 334.6 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.2-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip) | `D1F6146DEA6154BB73BC758180C594BC1F7DFE5525E8BF9F3D687CC2FA64F377` |
+| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.6 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.2-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe) | `3A998F2A4EE5C2DB6ED70A20C4E5B82EE9C30289779B74E23B193886656F65E8` |
+| **精简框架依赖版** | 轻量压缩包（约 335.0 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.2-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip) | `E05F7311930F1DD51A1835AC440F9D6315C598391369AD8CBBDD4478ADC4CD7F` |
 
 ## 核心安全机制
 

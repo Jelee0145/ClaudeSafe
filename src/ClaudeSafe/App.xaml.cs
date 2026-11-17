@@ -27,6 +27,13 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
+            if (_mainWindow is { IsClosingOrClosed: true })
+            {
+                args.Handled = true;
+                Shutdown(0);
+                return;
+            }
+
             MessageBox.Show(
                 $"界面运行发生未捕获异常（已拦截防止闪退）：\n{args.Exception.Message}",
                 "ClaudeSafe 异常保护",

@@ -41,6 +41,13 @@ public sealed class RuntimeWatchdogService : IDisposable
     private int _remainingCooldownSeconds;
     private bool _cooldownHadRunningClaude;
     private int _recoveryProbeRunning;
+    private volatile bool _isExitPromptActive;
+
+    public bool IsExitPromptActive
+    {
+        get => _isExitPromptActive;
+        set => _isExitPromptActive = value;
+    }
 
     public AppProtectionState State
     {
@@ -278,6 +285,8 @@ public sealed class RuntimeWatchdogService : IDisposable
             try
             {
                 await Task.Delay(1000, ct).ConfigureAwait(false);
+                if (_isExitPromptActive)
+                    continue;
                 _tickCounter++;
 
                 AppProtectionState snapshotState;

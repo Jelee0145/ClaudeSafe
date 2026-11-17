@@ -37,10 +37,14 @@ public partial class MainWindow : Window
     private WinForms.NotifyIcon? _trayIcon;
     private System.Drawing.Icon? _trayCustomIcon;
     private bool _isExplicitExit;
+    private bool _isClosingOrClosed;
+    private bool _isExitPromptOpen;
     private bool _isRestartingAsAdmin;
     private bool _killClaudeOnExit = true;
     private int _exitCleanupExecuted;
     private bool _isCircuitBreakerDialogOpen;
+
+    public bool IsClosingOrClosed => _isClosingOrClosed || _isExplicitExit;
     private bool _hasShownTrayHint;
     private bool _isLaunchingOrChecking;
     private readonly bool _startMinimized;
@@ -70,6 +74,7 @@ public partial class MainWindow : Window
 
         RiskItemsList.ItemsSource = _checkItems;
         IssueItemsList.ItemsSource = _issueItems;
+        Closed += (_, _) => _isClosingOrClosed = true;
 
         WireEvents();
         InitializeTrayIcon();
@@ -78,21 +83,31 @@ public partial class MainWindow : Window
     private void WireEvents()
     {
         _gatekeeper.OnTrafficLog += msg => Dispatcher.BeginInvoke(() => AppendLog(msg));
-        _gatekeeper.OnStatsChanged += () => Dispatcher.BeginInvoke(UpdateGatekeeperStatusUi);
+        _gatekeeper.OnStatsChanged += () => Dispatcher.BeginInvoke(() =>
+        {
+            if (IsClosingOrClosed) return;
+            UpdateGatekeeperStatusUi();
+        });
 
         _watchdog.OnLog += msg => Dispatcher.BeginInvoke(() => AppendLog(msg));
         _watchdog.OnStateChanged += state => Dispatcher.BeginInvoke(() => ApplyStateUi(state));
-        _watchdog.OnCooldownTick += rem => Dispatcher.BeginInvoke(() => UpdateCooldownCountdownUi(rem));
+        _watchdog.OnCooldownTick += rem => Dispatcher.BeginInvoke(() =>
+        {
+            if (IsClosingOrClosed) return;
+            UpdateCooldownCountdownUi(rem);
+        });
         _watchdog.OnCircuitBreakerTripped += args => Dispatcher.BeginInvoke(() => HandleCircuitBreakerTripped(args));
 
         _watchdog.OnCooldownExpired += () => Dispatcher.BeginInvoke(() =>
         {
+            if (IsClosingOrClosed) return;
             ShowTrayBalloon("冷静期已结束", "超时未恢复安全网络，已自动退出 Claude 并继续封锁流量。", WinForms.ToolTipIcon.Warning);
             AppendLog("⏳ 冷静期倒计时结束，已自动清理 Claude 进程并保持封锁。");
         });
 
         _watchdog.OnCooldownAutoRecovered += (report, resumedRunningClaude) => Dispatcher.BeginInvoke(() =>
         {
+            if (IsClosingOrClosed) return;
             _lastReport = report;
             ApplyReportToUi(report);
 
@@ -113,11 +128,13 @@ public partial class MainWindow : Window
 
         _watchdog.OnClaudeExitedCleanly += msg => Dispatcher.BeginInvoke(() =>
         {
+            if (IsClosingOrClosed || _isExitPromptOpen) return;
             ShowTrayBalloon("Claude 已退出并自动封锁", msg, WinForms.ToolTipIcon.Info);
         });
 
         _watchdog.OnUnauthorizedLaunchBlocked += msg => Dispatcher.BeginInvoke(() =>
         {
+            if (IsClosingOrClosed || _isExitPromptOpen) return;
             ShowTrayBalloon("防裸连拦截已触发", msg, WinForms.ToolTipIcon.Error);
             RestoreAndFocusWindow();
         });
@@ -269,6 +286,9 @@ public partial class MainWindow : Window
 
     private void ApplyStateUi(AppProtectionState state)
     {
+        if (IsClosingOrClosed || _isExitPromptOpen)
+            return;
+
         CooldownPill.Visibility = state == AppProtectionState.CooldownLocked ? Visibility.Visible : Visibility.Collapsed;
         BtnSecondaryKill.Visibility = state is AppProtectionState.CooldownLocked or AppProtectionState.CircuitBreakerTripped
             ? Visibility.Visible
@@ -676,17 +696,36 @@ public partial class MainWindow : Window
 
     private void HandleCircuitBreakerTripped(CircuitBreakerTrippedEventArgs args)
     {
-        if (_isCircuitBreakerDialogOpen)
+        if (IsClosingOrClosed || _isExitPromptOpen || _isCircuitBreakerDialogOpen)
             return;
 
         _isCircuitBreakerDialogOpen = true;
         try
         {
             RestoreAndFocusWindow();
+            if (IsClosingOrClosed || _isExitPromptOpen)
+                return;
+
             ShowTrayBalloon("🚨 网络异常已毫秒级熔断", $"{args.Reason}。已切断流量并保留 Claude 进程。", WinForms.ToolTipIcon.Error);
 
-            var dialog = new CircuitBreakerWindow(args, _config.CooldownDurationSeconds) { Owner = this };
-            var dialogResult = dialog.ShowDialog();
+            var dialog = new CircuitBreakerWindow(args, _config.CooldownDurationSeconds);
+            if (IsLoaded && IsVisible && !IsClosingOrClosed && PresentationSource.FromVisual(this) != null)
+            {
+                dialog.Owner = this;
+            }
+
+            bool? dialogResult;
+            try
+            {
+                dialogResult = dialog.ShowDialog();
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
+
+            if (IsClosingOrClosed)
+                return;
 
             if (dialogResult == true && dialog.SelectedAction == CircuitBreakerAction.KillClaudeProcesses)
             {
@@ -972,6 +1011,9 @@ public partial class MainWindow : Window
 
     private void AppendLog(string message)
     {
+        if (IsClosingOrClosed)
+            return;
+
         var line = $"[{DateTime.Now:HH:mm:ss}] {message}{Environment.NewLine}";
         TxtAuditLog.AppendText(line);
         if (TxtAuditLog.Text.Length > 40000)
@@ -983,17 +1025,38 @@ public partial class MainWindow : Window
 
     public void RestoreAndFocusWindow()
     {
-        if (!IsVisible) Show();
-        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
-        Activate();
-        Topmost = true;
-        Topmost = false;
-        Focus();
+        if (IsClosingOrClosed)
+            return;
+
+        try
+        {
+            if (!IsVisible) Show();
+            if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+            Activate();
+            Topmost = true;
+            Topmost = false;
+            Focus();
+        }
+        catch (InvalidOperationException)
+        {
+            // Ignore window state operations after window has closed
+        }
     }
 
     private void HideToTrayWithHint()
     {
-        Hide();
+        if (IsClosingOrClosed)
+            return;
+
+        try
+        {
+            Hide();
+        }
+        catch (InvalidOperationException)
+        {
+            return;
+        }
+
         if (!_hasShownTrayHint)
         {
             _hasShownTrayHint = true;
@@ -1018,26 +1081,52 @@ public partial class MainWindow : Window
 
     private void ExitApplicationCompletely()
     {
+        if (_isClosingOrClosed || _isExplicitExit || _isExitPromptOpen)
+            return;
+
         _killClaudeOnExit = true;
 
         if (!_isRestartingAsAdmin && _processService.GetRunningClaudeProcessCount() > 0)
         {
-            RestoreAndFocusWindow();
-            var answer = MessageBox.Show(
-                this,
-                "Claude Desktop 正在运行，是否同步退出？\n\n• 点击【是】：同步关闭 Claude Desktop，并退出 ClaudeSafe（还原所有网络、防火墙与 Hosts 设置）。\n• 点击【否】：保留 Claude Desktop，仅退出 ClaudeSafe 并还原系统设置。\n• 点击【取消】：取消退出，继续保持后台安全守护。",
-                "退出确认",
-                MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Question);
+            _isExitPromptOpen = true;
+            _watchdog.IsExitPromptActive = true;
+            try
+            {
+                RestoreAndFocusWindow();
 
-            if (answer == MessageBoxResult.Cancel || answer == MessageBoxResult.None)
-                return;
+                const string promptText =
+                    "Claude Desktop 正在运行，是否同步退出？\n\n• 点击【是】：同步关闭 Claude Desktop，并退出 ClaudeSafe（还原所有网络、防火墙与 Hosts 设置）。\n• 点击【否】：保留 Claude Desktop，仅退出 ClaudeSafe 并还原系统设置。\n• 点击【取消】：取消退出，继续保持后台安全守护。";
+                bool canUseOwner = IsLoaded && IsVisible && !_isClosingOrClosed && PresentationSource.FromVisual(this) != null;
+                var answer = canUseOwner
+                    ? MessageBox.Show(this, promptText, "退出确认", MessageBoxButton.YesNoCancel, MessageBoxImage.Question)
+                    : MessageBox.Show(promptText, "退出确认", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
-            _killClaudeOnExit = answer == MessageBoxResult.Yes;
+                if (answer == MessageBoxResult.Cancel || answer == MessageBoxResult.None)
+                    return;
+
+                _killClaudeOnExit = answer == MessageBoxResult.Yes;
+            }
+            finally
+            {
+                _isExitPromptOpen = false;
+                _watchdog.IsExitPromptActive = false;
+            }
         }
 
         _isExplicitExit = true;
-        Close();
+        _isClosingOrClosed = true;
+        PerformExitCleanup(_isRestartingAsAdmin);
+
+        try
+        {
+            Close();
+        }
+        catch (InvalidOperationException)
+        {
+            // Window may already be closing or closed
+        }
+
+        Application.Current?.Shutdown(0);
     }
 
     public void PerformExitCleanup(bool isRestartingAsAdmin = false)
