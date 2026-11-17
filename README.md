@@ -2,6 +2,7 @@
 
 ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Claude Desktop 安全启动器、本地守门代理与运行期断流熔断助手**（基于 .NET 8 WPF，零第三方运行库依赖）。
 
+> 🌐 **项目主页 (Home)**：https://ccsafe.lyzi.cloud  
 > 📦 **最新版本下载**：[GitHub Releases (v1.0.0)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.0)
 
 ## 快速下载 (v1.0.0)
