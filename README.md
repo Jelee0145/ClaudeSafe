@@ -1,6 +1,12 @@
-# ClaudeSafe — Claude 中国用户安全启动与防封号卫士
+# ClaudeSafe — Claude Desktop 网络安全启动器与代理泄漏防护工具
 
-ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Claude Desktop 安全启动器、本地守门代理与运行期断流熔断助手**（基于 .NET 8 WPF，零第三方运行库依赖）。
+ClaudeSafe 是一款面向需要监控代理连接和网络出口环境的 Windows 用户的 **Claude Desktop 安全启动器、本地守门代理与运行期断流保护工具**，使用 .NET 8 WPF 开发。
+
+**English:** ClaudeSafe is an open-source Windows safety launcher and local proxy gatekeeper for Claude Desktop. It checks proxy connectivity, outbound IP information and routing before launch, then monitors the connection during use and can disconnect the controlled proxy when it detects a change. Built with .NET 8 and WPF.
+
+**Keywords:** ClaudeSafe, Claude Desktop, proxy monitoring, IP leak detection, network kill switch, Windows, WPF.
+
+> **说明 / Disclaimer:** ClaudeSafe 是独立开源项目，并非 Anthropic 官方产品。网络检查与断流机制旨在减少意外直连和网络环境变化带来的风险，**不保证避免账号限制、封禁或其他风控结果**。
 
 > 🌐 **项目主页 (Home)**：https://ccsafe.lyzi.cloud  
 > 📦 **最新版本下载**：[GitHub Releases (v1.0.2)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.2)
@@ -24,11 +30,11 @@ ClaudeSafe 是一款专为中国大陆及受限网络环境用户设计的 **Cla
 
 2. **内置本地守门代理 (`GatekeeperProxyServer`)**
    - 启动时在 `127.0.0.1:17890`（可自定义）建立受控 HTTP/HTTPS 代理阀门，默认锁死。
-   - 仅在安全体检全部通过后开启阀门，并通过 `--proxy-server="http://127.0.0.1:17890"` 及代理环境变量接管 Claude Desktop 全部网络流量。
+   - 仅在安全体检全部通过后开启阀门，并通过 `--proxy-server="http://127.0.0.1:17890"` 及代理环境变量引导 Claude Desktop 的网络请求经过本地代理。实际覆盖范围仍取决于应用内部的网络实现，不能仅凭启动参数保证所有流量均被接管。
 
-3. **运行期断流 / IP 异动毫秒级熔断 + 5 分钟冷静期**
+3. **运行期断流 / IP 异动检测与熔断 + 5 分钟冷静期**
    - Claude 运行期间每 3 秒巡检代理端口连通性、每 15 秒校验出口 IP 是否变动。
-   - 一旦检测到 VPN 掉线或出口 IP 漂移，**第 0 毫秒立即锁死守门代理并强制切断全部活跃 TCP 连接（不直接杀 Claude 进程，保留您的工作现场）**，置顶弹出紧急熔断窗口：
+   - 一旦巡检检测到 VPN 掉线或出口 IP 漂移，**立即锁死守门代理并尝试切断其管理的活跃 TCP 连接（不直接杀 Claude 进程，以尽量保留工作现场）**。注意巡检采用 3 秒/15 秒间隔，异常发生到被检测到之间可能存在时间窗口，置顶弹出紧急熔断窗口：
      - **锁定网络并进入 5 分钟冷静期**：保持 100% 断网状态并开启 5 分钟倒计时供您修复 VPN，修复后点击【重新体检并恢复连接】即可恢复通信；超时未恢复则自动强杀。
      - **立即退出并强杀所有 Claude 进程**：立刻终止全部进程树并锁定网络。
 
@@ -48,3 +54,36 @@ dotnet run --project src/ClaudeSafe -- --self-test
 # 启动桌面程序
 dotnet run --project src/ClaudeSafe -c Release
 ```
+
+## Frequently Asked Questions / 常见问题
+
+### What is ClaudeSafe?
+
+ClaudeSafe is an open-source Windows utility for checking Claude Desktop's proxy/network environment before launch and monitoring connectivity while the app is running. It includes a local proxy gatekeeper and connection-interruption controls.
+
+### Is ClaudeSafe an official Anthropic or Claude product?
+
+No. ClaudeSafe is an independent community project and is not affiliated with, endorsed by or supported by Anthropic.
+
+### Can ClaudeSafe prevent Claude account bans?
+
+No tool can guarantee that an account will not be restricted. ClaudeSafe focuses on network diagnostics and reducing accidental direct connections. Account eligibility and enforcement are determined by the service provider.
+
+### Does ClaudeSafe protect all Claude Desktop traffic?
+
+The launcher configures proxy arguments and environment variables and provides a local gatekeeper. Some application components may use their own networking stack, so complete traffic coverage requires independent testing.
+
+### Which operating systems are supported?
+
+The published binaries target **Windows x64**. ClaudeSafe is developed with **.NET 8 and WPF**; it is not a native macOS or Linux application.
+
+### Where can I download ClaudeSafe?
+
+Download published builds from the [official GitHub Releases page](https://github.com/Jelee0145/ClaudeSafe/releases). The [project website](https://ccsafe.lyzi.cloud) provides an additional entry point.
+
+## Project links / 项目链接
+
+- Website / 官网：https://ccsafe.lyzi.cloud
+- Source code / 源代码：https://github.com/Jelee0145/ClaudeSafe
+- Releases / 版本下载：https://github.com/Jelee0145/ClaudeSafe/releases
+- Issues / 问题反馈：https://github.com/Jelee0145/ClaudeSafe/issues
