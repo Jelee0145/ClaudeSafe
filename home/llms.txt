@@ -1,0 +1,37 @@
+# ClaudeSafe
+
+> ClaudeSafe is an independent Windows utility for checking and monitoring the proxy/network environment used by Claude Desktop. It is not an Anthropic product.
+
+## Project
+
+- Website: https://ccsafe.lyzi.cloud/
+- Source code: https://github.com/Jelee0145/ClaudeSafe
+- Releases: https://github.com/Jelee0145/ClaudeSafe/releases
+- Issues: https://github.com/Jelee0145/ClaudeSafe/issues
+
+## What it does
+
+- Checks local proxy connectivity before launching Claude Desktop.
+- Checks outbound IP information and selected network/environment signals.
+- Tests connectivity to Claude/Anthropic endpoints through the selected proxy.
+- Uses a local Gatekeeper proxy to control requests routed through it.
+- Monitors upstream proxy connectivity every 3 seconds and outbound IP changes every 15 seconds in the current implementation.
+- Locks the controlled proxy path when a monitored network anomaly is detected.
+
+## Platform
+
+- Windows 10 / Windows 11, x64.
+- Built with .NET 8 and WPF.
+- Current website release information: v1.0.2. Check GitHub Releases for the latest version.
+
+## Important limitations
+
+- ClaudeSafe is independent and is not affiliated with, endorsed by, or supported by Anthropic.
+- It cannot guarantee that a Claude account will not be restricted or banned.
+- Periodic monitoring means there can be a delay between a network change and its detection.
+- Proxy launch arguments and environment variables do not prove that every network request from every Claude Desktop component is routed through Gatekeeper. Coverage should be independently tested.
+
+## Documentation
+
+See the README on GitHub for the feature overview, build instructions, release downloads, and FAQ:
+https://github.com/Jelee0145/ClaudeSafe#readme

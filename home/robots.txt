@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ccsafe.lyzi.cloud/sitemap.xml
