@@ -9,14 +9,14 @@ ClaudeSafe 是一款面向需要监控代理连接和网络出口环境的 Windo
 > **免责声明：** ClaudeSafe 是独立开源项目，并非 Anthropic 官方产品。网络检查与断流机制旨在减少意外直连和网络环境变化带来的风险，**不保证避免账号限制、封禁或其他风控结果**。
 
 > 🌐 **项目主页**：https://ccsafe.lyzi.cloud  
-> 📦 **最新版本下载**：[GitHub Releases (v1.0.2)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.2)
+> 📦 **最新版本下载**：[GitHub Releases (v1.1.0)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.1.0)
 
-## 快速下载 (v1.0.2)
+## 快速下载 (v1.1.0)
 
 | 版本 | 说明 | 下载链接 | SHA256 |
 | --- | --- | --- | --- |
-| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.6 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.0.2-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe) | `3A998F2A4EE5C2DB6ED70A20C4E5B82EE9C30289779B74E23B193886656F65E8` |
-| **精简框架依赖版** | 轻量压缩包（约 335.0 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.0.2-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip) | `E05F7311930F1DD51A1835AC440F9D6315C598391369AD8CBBDD4478ADC4CD7F` |
+| **独立单文件版（推荐）** | Windows x64 自包含单文件（约 154.7 MB），内置 .NET 8 运行时，双击即用 | [ClaudeSafe-v1.1.0-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-x64-standalone.exe) | `85EC48EB072CDEBC6C32DE2DA0182FBA8F72C060B0745DF10B5C64EB322F1FF1` |
+| **精简框架依赖版** | 轻量压缩包（约 394.9 KB），需本机已安装 .NET 8 Desktop Runtime | [ClaudeSafe-v1.1.0-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-framework-dependent.zip) | `994E067B7FAAF1AC34CF2B0C16991AE28B289AD042505855BC6606E8FEDB026C` |
 
 ## 核心安全机制
 

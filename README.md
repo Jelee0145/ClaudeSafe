@@ -9,14 +9,14 @@ ClaudeSafe is an open-source Windows safety launcher, local proxy gatekeeper, an
 > **Disclaimer:** ClaudeSafe is an independent open-source project and is not affiliated with, endorsed by, or supported by Anthropic. Network checks and circuit-breaker controls are designed to reduce accidental direct connections and risks from network changes, and **do not guarantee prevention of account restrictions, bans, or other enforcement actions**.
 
 > 🌐 **Project Home:** https://ccsafe.lyzi.cloud  
-> 📦 **Latest Release:** [GitHub Releases (v1.0.2)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.2)
+> 📦 **Latest Release:** [GitHub Releases (v1.1.0)](https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.1.0)
 
-## Quick Download (v1.0.2)
+## Quick Download (v1.1.0)
 
 | Edition | Description | Download | SHA256 |
 | --- | --- | --- | --- |
-| **Standalone Single-File (Recommended)** | Windows x64 self-contained single executable (~154.6 MB) with .NET 8 runtime bundled | [ClaudeSafe-v1.0.2-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe) | `3A998F2A4EE5C2DB6ED70A20C4E5B82EE9C30289779B74E23B193886656F65E8` |
-| **Framework-Dependent** | Lightweight archive (~335.0 KB); requires .NET 8 Desktop Runtime installed | [ClaudeSafe-v1.0.2-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip) | `E05F7311930F1DD51A1835AC440F9D6315C598391369AD8CBBDD4478ADC4CD7F` |
+| **Standalone Single-File (Recommended)** | Windows x64 self-contained single executable (~154.7 MB) with .NET 8 runtime bundled | [ClaudeSafe-v1.1.0-win-x64-standalone.exe](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-x64-standalone.exe) | `85EC48EB072CDEBC6C32DE2DA0182FBA8F72C060B0745DF10B5C64EB322F1FF1` |
+| **Framework-Dependent** | Lightweight archive (~394.9 KB); requires .NET 8 Desktop Runtime installed | [ClaudeSafe-v1.1.0-win-framework-dependent.zip](https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-framework-dependent.zip) | `994E067B7FAAF1AC34CF2B0C16991AE28B289AD042505855BC6606E8FEDB026C` |
 
 ## Core Safety Mechanisms
 

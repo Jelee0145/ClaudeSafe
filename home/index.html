@@ -36,7 +36,7 @@
         "url": "https://ccsafe.lyzi.cloud/",
         "applicationCategory": "SecurityApplication",
         "operatingSystem": "Windows 10, Windows 11 (x64)",
-        "softwareVersion": "1.0.2",
+        "softwareVersion": "1.1.0",
         "downloadUrl": "https://github.com/Jelee0145/ClaudeSafe/releases",
         "codeRepository": "https://github.com/Jelee0145/ClaudeSafe",
         "author": {
@@ -1502,22 +1502,25 @@
         <span>ClaudeSafe</span>
       </a>
 
-      <nav class="nav-links" aria-label="主导航">
-        <a href="#checks">核心机制</a>
-        <a href="#top">交互演示</a>
-        <a href="#architecture">架构原理</a>
-        <a href="#download">下载与校验</a>
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#checks" data-i18n="nav_checks">核心机制</a>
+        <a href="#top" data-i18n="nav_demo">交互演示</a>
+        <a href="#architecture" data-i18n="nav_arch">架构原理</a>
+        <a href="#download" data-i18n="nav_dl">下载与校验</a>
       </nav>
 
       <div class="nav-actions">
+        <button id="langToggleBtn" type="button" class="btn btn-ghost btn-sm" aria-label="Switch language">
+          🌐 English
+        </button>
         <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
           </svg>
           GitHub
         </a>
-        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe" class="btn btn-primary btn-sm">
-          立即下载 v1.0.2
+        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-x64-standalone.exe" class="btn btn-primary btn-sm" data-i18n="nav_download_btn">
+          立即下载 v1.1.0
         </a>
       </div>
     </div>
@@ -1530,51 +1533,51 @@
         <div>
           <div class="badge-pill">
             <span class="badge-dot"></span>
-            <span>v1.0.2 正式发布 · .NET 8 WPF 零第三方依赖</span>
+            <span data-i18n="hero_badge">v1.1.0 正式发布 · 中英双语 · .NET 8 WPF 零第三方依赖</span>
           </div>
-          <h1 class="hero-title">
+          <h1 class="hero-title" data-i18n-html="hero_title">
             ClaudeSafe — Claude Desktop<span>网络连接安全工具</span>
           </h1>
-          <p class="hero-desc">
+          <p class="hero-desc" data-i18n="hero_desc">
             面向 Windows 用户的 Claude Desktop 网络安全启动器。启动前执行 6 项代理与出口环境检查，并通过本地 Gatekeeper 代理引导应用网络请求；运行期间按设定间隔检查代理连通性与出口 IP 变化，检测到异常后锁定受控代理连接，帮助降低意外直连风险。ClaudeSafe 不能保证避免账号限制或封禁，实际网络流量覆盖范围也取决于应用自身的网络实现。
           </p>
 
           <div class="hero-cta-group">
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe" class="btn btn-primary btn-lg">
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-x64-standalone.exe" class="btn btn-primary btn-lg">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              下载独立单文件版 .exe (154.6 MB)
+              <span data-i18n="hero_dl_standalone">下载独立单文件版 .exe (154.7 MB)</span>
             </a>
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip" class="btn btn-secondary btn-lg">
-              下载精简框架依赖版 .zip (335.0 KB)
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-framework-dependent.zip" class="btn btn-secondary btn-lg" data-i18n="hero_dl_fw">
+              下载精简框架依赖版 .zip (394.9 KB)
             </a>
           </div>
 
           <div class="hero-meta-links">
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.2" target="_blank" rel="noopener noreferrer">
-              查看 v1.0.2 Release 说明 →
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.1.0" target="_blank" rel="noopener noreferrer" data-i18n="hero_meta_release">
+              查看 v1.1.0 Release 说明 →
             </a>
-            <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer" data-i18n="hero_meta_src">
               浏览源代码仓库 →
             </a>
-            <a href="#download">SHA256 校验码</a>
+            <a href="#download" data-i18n="hero_meta_sha">SHA256 校验码</a>
           </div>
 
           <div class="hero-highlights">
             <div class="highlight-stat">
-              <strong>6 维启动前体检</strong>
-              <span>通道 / 地区 / 纯净度 / 漂移 / 防漏 / 时区</span>
+              <strong data-i18n="hl1_title">6 维启动前体检</strong>
+              <span data-i18n="hl1_desc">通道 / 地区 / 纯净度 / 漂移 / 防漏 / 时区</span>
             </div>
             <div class="highlight-stat">
-              <strong>运行期异常断流保护</strong>
-              <span>检测到代理或出口变化后锁定受控连接</span>
+              <strong data-i18n="hl2_title">运行期异常断流保护</strong>
+              <span data-i18n="hl2_desc">检测到代理或出口变化后锁定受控连接</span>
             </div>
             <div class="highlight-stat">
-              <strong>常态防裸连封锁</strong>
-              <span>防火墙出站拦截 + 看门狗进程守护</span>
+              <strong data-i18n="hl3_title">常态防裸连封锁</strong>
+              <span data-i18n="hl3_desc">防火墙出站拦截 + 看门狗进程守护</span>
             </div>
           </div>
         </div>
@@ -1583,11 +1586,11 @@
         <div class="simulator-wrap">
           <div id="simulatorHost" aria-live="polite"></div>
 
-          <div class="sim-external-bar" aria-label="组件外部测试控制">
-            <button class="sim-ext-btn breaker" type="button" id="extTestBreakerBtn">
+          <div class="sim-external-bar" aria-label="Simulator Controls">
+            <button class="sim-ext-btn breaker" type="button" id="extTestBreakerBtn" data-i18n="sim_ext_breaker">
               ⚡ 测试断流熔断机制
             </button>
-            <button class="sim-ext-btn reset" type="button" id="extResetSimBtn" hidden>
+            <button class="sim-ext-btn reset" type="button" id="extResetSimBtn" data-i18n="sim_ext_reset" hidden>
               ↺ 恢复初始待启动状态
             </button>
           </div>
@@ -1604,8 +1607,8 @@
       <div class="container">
         <div class="section-header">
           <span class="section-kicker">Pre-Flight Diagnostics</span>
-          <h2 class="section-title">启动前 6 维网络与风控体检</h2>
-          <p class="section-subtitle">
+          <h2 class="section-title" data-i18n="chk_sec_title">启动前 6 维网络与风控体检</h2>
+          <p class="section-subtitle" data-i18n="chk_sec_sub">
             在向 Claude Desktop 放行任何字节之前，ClaudeSafe 先行完成六项交叉验证，任一高危项不通过即直接阻断启动。
           </p>
         </div>
@@ -1614,10 +1617,10 @@
           <article class="check-card">
             <div class="check-card-head">
               <span class="check-num">01</span>
-              <span class="check-tag tag-safe">通道探测</span>
+              <span class="check-tag tag-safe" data-i18n="chk1_tag">通道探测</span>
             </div>
-            <h3>本地代理通道检测</h3>
-            <p>
+            <h3 data-i18n="chk1_title">本地代理通道检测</h3>
+            <p data-i18n-html="chk1_desc">
               自动读取 Windows 系统代理并扫描常见本地代理端口（<code>7890</code> / <code>7897</code> / <code>10808</code> / <code>10809</code> 等），同时识别 TUN 虚拟网卡与进程状态，确认上游代理可用性与延迟。
             </p>
           </article>
@@ -1625,10 +1628,10 @@
           <article class="check-card">
             <div class="check-card-head">
               <span class="check-num">02</span>
-              <span class="check-tag tag-danger">高危阻断</span>
+              <span class="check-tag tag-danger" data-i18n="chk2_tag">高危阻断</span>
             </div>
-            <h3>出口 IP 与地区合规检测</h3>
-            <p>
+            <h3 data-i18n="chk2_title">出口 IP 与地区合规检测</h3>
+            <p data-i18n-html="chk2_desc">
               并发/级联探测多个 GeoIP 源，实时确认当前代理出口国家/地区。若出口位于受限或封禁地区（如 <code>CN</code>、<code>HK</code>、<code>MO</code>、<code>RU</code> 等），直接触发高危阻断，严禁启动。
             </p>
           </article>
@@ -1636,10 +1639,10 @@
           <article class="check-card">
             <div class="check-card-head">
               <span class="check-num">03</span>
-              <span class="check-tag tag-warn">风控评估</span>
+              <span class="check-tag tag-warn" data-i18n="chk3_tag">风控评估</span>
             </div>
-            <h3>IP 属性与机房纯净度评估</h3>
-            <p>
+            <h3 data-i18n="chk3_title">IP 属性与机房纯净度评估</h3>
+            <p data-i18n-html="chk3_desc">
               自动识别 IP 的 <code>Hosting</code> / <code>Proxy</code> 标记与常见云厂商、共享机房 ASN，提前提示高并发共享机房 IP 可能带来的 Anthropic 风控权重风险。
             </p>
           </article>
@@ -1647,10 +1650,10 @@
           <article class="check-card">
             <div class="check-card-head">
               <span class="check-num">04</span>
-              <span class="check-tag tag-warn">漂移预警</span>
+              <span class="check-tag tag-warn" data-i18n="chk4_tag">漂移预警</span>
             </div>
-            <h3>历史 IP 漂移防风控对比</h3>
-            <p>
+            <h3 data-i18n="chk4_title">历史 IP 漂移防风控对比</h3>
+            <p data-i18n="chk4_desc">
               本地持久化记录上次安全登录使用的出口 IP、ASN 与国家代码；若本次启动发生跨国跳变或节点频繁切换，立即提示异常漂移预警，避免触发异地风控。
             </p>
           </article>
@@ -1658,10 +1661,10 @@
           <article class="check-card">
             <div class="check-card-head">
               <span class="check-num">05</span>
-              <span class="check-tag tag-danger">防泄漏验证</span>
+              <span class="check-tag tag-danger" data-i18n="chk5_tag">防泄漏验证</span>
             </div>
-            <h3>Anthropic 连通性与分流防泄漏</h3>
-            <p>
+            <h3 data-i18n="chk5_title">Anthropic 连通性与分流防泄漏</h3>
+            <p data-i18n-html="chk5_desc">
               直接经由选定代理请求 <code>https://claude.ai/cdn-cgi/trace</code> 验证真实出口归属地，彻底堵住「GeoIP 走了代理、但 Claude 域名误走 <code>DIRECT</code>」的隐蔽分流漏洞。
             </p>
           </article>
@@ -1669,10 +1672,10 @@
           <article class="check-card">
             <div class="check-card-head">
               <span class="check-num">06</span>
-              <span class="check-tag tag-warn">环境校验</span>
+              <span class="check-tag tag-warn" data-i18n="chk6_tag">环境校验</span>
             </div>
-            <h3>系统时区与环境一致性检查</h3>
-            <p>
+            <h3 data-i18n="chk6_title">系统时区与环境一致性检查</h3>
+            <p data-i18n="chk6_desc">
               校验当前 Windows 系统时区（UTC 偏移）与出口 IP 所在地理区域是否存在显著偏差，帮助用户识别潜在指纹不一致风险并给出调整建议。
             </p>
           </article>
@@ -1685,14 +1688,14 @@
       <div class="container">
         <div class="section-header">
           <span class="section-kicker">Architecture &amp; Circuit Breaker</span>
-          <h2 class="section-title">本地守门代理与运行期断流保护</h2>
-          <p class="section-subtitle">
+          <h2 class="section-title" data-i18n="arch_sec_title">本地守门代理与运行期断流保护</h2>
+          <p class="section-subtitle" data-i18n="arch_sec_sub">
             启动前检查代理与出口环境，并在会话期间定期监控受控代理连接。检测到异常后锁定 Gatekeeper；实际流量覆盖范围取决于 Claude Desktop 各组件的网络实现。
           </p>
         </div>
 
         <div class="pipeline-box">
-          <div class="pipeline-flow" aria-label="守门代理流量接管链路">
+          <div class="pipeline-flow" aria-label="Gatekeeper Traffic Pipeline">
             <div class="pipe-node">
               <div class="pipe-node-title">Claude Desktop</div>
               <div class="pipe-node-sub">--proxy-server=http://127.0.0.1:17890</div>
@@ -1700,36 +1703,36 @@
             <div class="pipe-arrow" aria-hidden="true">→</div>
             <div class="pipe-node gatekeeper">
               <div class="pipe-node-title">GatekeeperProxyServer</div>
-              <div class="pipe-node-sub">127.0.0.1:17890 · 默认锁定 / 异常时关闭</div>
+              <div class="pipe-node-sub" data-i18n="pipe_gate_sub">127.0.0.1:17890 · 默认锁定 / 异常时关闭</div>
             </div>
             <div class="pipe-arrow" aria-hidden="true">→</div>
             <div class="pipe-node">
-              <div class="pipe-node-title">上游本地代理</div>
+              <div class="pipe-node-title" data-i18n="pipe_up_title">上游本地代理</div>
               <div class="pipe-node-sub">7890 / 7897 / 10808 / TUN</div>
             </div>
             <div class="pipe-arrow" aria-hidden="true">→</div>
             <div class="pipe-node safe-node">
               <div class="pipe-node-title">Anthropic</div>
-              <div class="pipe-node-sub">claude.ai (已验证非受限出口)</div>
+              <div class="pipe-node-sub" data-i18n="pipe_dest_sub">claude.ai (已验证非受限出口)</div>
             </div>
           </div>
 
           <div class="arch-pillars">
             <div class="pillar">
-              <div class="pillar-title">⚡ 检测到异常后快速断流</div>
-              <p class="pillar-desc">
+              <div class="pillar-title" data-i18n="pillar1_title">⚡ 检测到异常后快速断流</div>
+              <p class="pillar-desc" data-i18n-html="pillar1_desc">
                 <code>RuntimeWatchdogService</code> 每 3 秒巡检上游代理连通性、每 15 秒校验出口 IP。检测到异常后锁定 <code>GatekeeperProxyServer</code>，并尝试切断其管理的活跃连接。由于采用定时巡检，异常发生到被发现之间可能存在时间窗口；该机制不承诺零延迟，也不代表能够覆盖应用的全部网络连接。
               </p>
             </div>
             <div class="pillar">
-              <div class="pillar-title">⏳ 5 分钟冷静期与置顶熔断</div>
-              <p class="pillar-desc">
+              <div class="pillar-title" data-i18n="pillar2_title">⏳ 5 分钟冷静期与置顶熔断</div>
+              <p class="pillar-desc" data-i18n-html="pillar2_desc">
                 置顶弹出 <code>CircuitBreakerWindow</code> 紧急熔断窗口：可选择「保持断网进入 5 分钟冷静期」，待 VPN 恢复并自动/手动复检通过后无损恢复；或选择立即强杀全部 Claude 进程树。
               </p>
             </div>
             <div class="pillar">
-              <div class="pillar-title">🛡️ 退出无痕还原与常态防裸连</div>
-              <p class="pillar-desc">
+              <div class="pillar-title" data-i18n="pillar3_title">🛡️ 退出无痕还原与常态防裸连</div>
+              <p class="pillar-desc" data-i18n="pillar3_desc">
                 后台驻留守护期间通过防火墙出站规则、Hosts 黑洞（管理员模式）及进程看门狗拦截未经体检的直接双击启动；彻底退出 ClaudeSafe 时若检测到 Claude Desktop 仍在运行会弹窗确认是否同步退出，并无痕还原所有系统代理、防火墙规则与 Hosts 设置；长按主界面星芒 Logo 1 秒可临时解锁 3P 模式。
               </p>
             </div>
@@ -1742,56 +1745,56 @@
     <section id="download" class="section section-alt">
       <div class="container">
         <div class="section-header">
-          <span class="section-kicker">GitHub Release v1.0.2</span>
-          <h2 class="section-title">下载 ClaudeSafe v1.0.2 并校验完整性</h2>
-          <p class="section-subtitle">
-            所有编译产物均托管于 GitHub Releases，基于 .NET 8 WPF 原生构建，无任何第三方运行库依赖。
+          <span class="section-kicker">GitHub Release v1.1.0</span>
+          <h2 class="section-title" data-i18n="dl_sec_title">下载 ClaudeSafe v1.1.0 并校验完整性</h2>
+          <p class="section-subtitle" data-i18n="dl_sec_sub">
+            所有编译产物均托管于 GitHub Releases，基于 .NET 8 WPF 原生构建，支持中/英双语界面，无任何第三方运行库依赖。
           </p>
         </div>
 
         <div class="download-grid">
           <article class="dl-card recommended">
             <div>
-              <span class="dl-badge primary">推荐 · 开箱即用</span>
-              <h3 class="dl-title">Windows x64 独立单文件版</h3>
-              <div class="dl-filename">ClaudeSafe-v1.0.2-win-x64-standalone.exe · 154.6 MB (162,127,321 bytes)</div>
+              <span class="dl-badge primary" data-i18n="dl1_badge">推荐 · 开箱即用</span>
+              <h3 class="dl-title" data-i18n="dl1_title">Windows x64 独立单文件版</h3>
+              <div class="dl-filename">ClaudeSafe-v1.1.0-win-x64-standalone.exe · 154.7 MB (162,188,761 bytes)</div>
               <ul class="dl-specs">
-                <li>内置 .NET 8 Windows Desktop 运行时，无需额外配置环境</li>
-                <li>单可执行文件，双击即可运行与守护</li>
-                <li>适用系统：Windows 10 / Windows 11 (x64)</li>
+                <li data-i18n="dl1_s1">内置 .NET 8 Windows Desktop 运行时，无需额外配置环境</li>
+                <li data-i18n="dl1_s2">单可执行文件，双击即可运行与守护</li>
+                <li data-i18n="dl1_s3">适用系统：Windows 10 / Windows 11 (x64)</li>
               </ul>
               <div class="sha-box">
                 <div class="sha-header">
                   <span>SHA256</span>
-                  <button class="copy-btn" data-copy="3A998F2A4EE5C2DB6ED70A20C4E5B82EE9C30289779B74E23B193886656F65E8">复制校验码</button>
+                  <button class="copy-btn" data-copy="85EC48EB072CDEBC6C32DE2DA0182FBA8F72C060B0745DF10B5C64EB322F1FF1" data-i18n="dl_copy">复制校验码</button>
                 </div>
-                <div class="sha-hash">3A998F2A4EE5C2DB6ED70A20C4E5B82EE9C30289779B74E23B193886656F65E8</div>
+                <div class="sha-hash">85EC48EB072CDEBC6C32DE2DA0182FBA8F72C060B0745DF10B5C64EB322F1FF1</div>
               </div>
             </div>
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-x64-standalone.exe" class="btn btn-primary btn-lg" style="width: 100%;">
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-x64-standalone.exe" class="btn btn-primary btn-lg" style="width: 100%;" data-i18n="dl1_btn">
               从 GitHub Release 下载单文件版
             </a>
           </article>
 
           <article class="dl-card">
             <div>
-              <span class="dl-badge secondary">轻量 · 需 .NET 8 Desktop Runtime</span>
-              <h3 class="dl-title">精简框架依赖版</h3>
-              <div class="dl-filename">ClaudeSafe-v1.0.2-win-framework-dependent.zip · 335.0 KB (343,010 bytes)</div>
+              <span class="dl-badge secondary" data-i18n="dl2_badge">轻量 · 需 .NET 8 Desktop Runtime</span>
+              <h3 class="dl-title" data-i18n="dl2_title">精简框架依赖版</h3>
+              <div class="dl-filename">ClaudeSafe-v1.1.0-win-framework-dependent.zip · 394.9 KB (404,362 bytes)</div>
               <ul class="dl-specs">
-                <li>体积仅约 335 KB，包含主程序及运行时配置文件（4 个文件）</li>
-                <li>需本机预先安装 Microsoft .NET 8 Desktop Runtime</li>
-                <li>解压至任意目录后运行 <code>ClaudeSafe.exe</code> 即可</li>
+                <li data-i18n="dl2_s1">体积仅约 395 KB，包含主程序及运行时配置文件（4 个文件）</li>
+                <li data-i18n="dl2_s2">需本机预先安装 Microsoft .NET 8 Desktop Runtime</li>
+                <li data-i18n-html="dl2_s3">解压至任意目录后运行 <code>ClaudeSafe.exe</code> 即可</li>
               </ul>
               <div class="sha-box">
                 <div class="sha-header">
                   <span>SHA256</span>
-                  <button class="copy-btn" data-copy="E05F7311930F1DD51A1835AC440F9D6315C598391369AD8CBBDD4478ADC4CD7F">复制校验码</button>
+                  <button class="copy-btn" data-copy="994E067B7FAAF1AC34CF2B0C16991AE28B289AD042505855BC6606E8FEDB026C" data-i18n="dl_copy">复制校验码</button>
                 </div>
-                <div class="sha-hash">E05F7311930F1DD51A1835AC440F9D6315C598391369AD8CBBDD4478ADC4CD7F</div>
+                <div class="sha-hash">994E067B7FAAF1AC34CF2B0C16991AE28B289AD042505855BC6606E8FEDB026C</div>
               </div>
             </div>
-            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.0.2/ClaudeSafe-v1.0.2-win-framework-dependent.zip" class="btn btn-secondary btn-lg" style="width: 100%;">
+            <a href="https://github.com/Jelee0145/ClaudeSafe/releases/download/v1.1.0/ClaudeSafe-v1.1.0-win-framework-dependent.zip" class="btn btn-secondary btn-lg" style="width: 100%;" data-i18n="dl2_btn">
               从 GitHub Release 下载精简压缩包
             </a>
           </article>
@@ -1799,12 +1802,12 @@
 
         <div class="cli-box">
           <div class="cli-col">
-            <h4>PowerShell 校验下载文件 SHA256</h4>
-            <pre>Get-FileHash .\ClaudeSafe-v1.0.2-win-x64-standalone.exe -Algorithm SHA256
-# 预期输出: 3A998F2A4EE5C2DB6ED70A20C4E5B82EE9C30289779B74E23B193886656F65E8</pre>
+            <h4 data-i18n="cli_sha_title">PowerShell 校验下载文件 SHA256</h4>
+            <pre>Get-FileHash .\ClaudeSafe-v1.1.0-win-x64-standalone.exe -Algorithm SHA256
+# Expected: 85EC48EB072CDEBC6C32DE2DA0182FBA8F72C060B0745DF10B5C64EB322F1FF1</pre>
           </div>
           <div class="cli-col">
-            <h4>从源码本地编译与模块自检</h4>
+            <h4 data-i18n="cli_build_title">从源码本地编译与模块自检</h4>
             <pre>git clone https://github.com/Jelee0145/ClaudeSafe.git
 cd ClaudeSafe
 dotnet build -c Release
@@ -1820,33 +1823,33 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
       <div class="container">
         <div class="section-header">
           <span class="section-kicker">FAQ</span>
-          <h2 class="section-title">ClaudeSafe 常见问题</h2>
-          <p class="section-subtitle">关于 ClaudeSafe 的用途、系统支持、网络保护范围与使用边界。</p>
+          <h2 class="section-title" data-i18n="faq_sec_title">ClaudeSafe 常见问题</h2>
+          <p class="section-subtitle" data-i18n="faq_sec_sub">关于 ClaudeSafe 的用途、系统支持、网络保护范围与使用边界。</p>
         </div>
         <div class="faq-list">
           <details class="faq-item">
-            <summary>ClaudeSafe 是什么？</summary>
-            <p>ClaudeSafe 是一款面向 Windows 的 Claude Desktop 网络安全启动器。它在启动前检查代理和出口网络环境，并通过本地 Gatekeeper 代理引导应用网络请求；运行期间定期检查代理连通性与出口 IP 变化，检测到异常后锁定受控代理连接。</p>
+            <summary data-i18n="faq1_q">ClaudeSafe 是什么？</summary>
+            <p data-i18n="faq1_a">ClaudeSafe 是一款面向 Windows 的 Claude Desktop 网络安全启动器。它在启动前检查代理和出口网络环境，并通过本地 Gatekeeper 代理引导应用网络请求；运行期间定期检查代理连通性与出口 IP 变化，检测到异常后锁定受控代理连接。</p>
           </details>
           <details class="faq-item">
-            <summary>ClaudeSafe 是 Anthropic 官方产品吗？</summary>
-            <p>不是。ClaudeSafe 是独立社区项目，与 Anthropic、Claude 官方没有隶属、背书或支持关系。</p>
+            <summary data-i18n="faq2_q">ClaudeSafe 是 Anthropic 官方产品吗？</summary>
+            <p data-i18n="faq2_a">不是。ClaudeSafe 是独立社区项目，与 Anthropic、Claude 官方没有隶属、背书或支持关系。</p>
           </details>
           <details class="faq-item">
-            <summary>ClaudeSafe 能保证 Claude 账号不被封禁吗？</summary>
-            <p>不能。ClaudeSafe 主要提供本地网络诊断、代理连接监控和意外直连风险缓解，无法控制服务提供方的账号资格判断或风控决定，也不保证避免账号限制或封禁。</p>
+            <summary data-i18n="faq3_q">ClaudeSafe 能保证 Claude 账号不被封禁吗？</summary>
+            <p data-i18n="faq3_a">不能。ClaudeSafe 主要提供本地网络诊断、代理连接监控和意外直连风险缓解，无法控制服务提供方的账号资格判断或风控决定，也不保证避免账号限制或封禁。</p>
           </details>
           <details class="faq-item">
-            <summary>ClaudeSafe 能接管 Claude Desktop 的全部网络流量吗？</summary>
-            <p>ClaudeSafe 会通过启动参数和代理环境变量引导 Claude Desktop 的网络请求经过本地 Gatekeeper。应用的部分组件可能使用独立网络实现，因此不能仅凭代理配置保证所有请求均被接管，实际覆盖范围需要独立测试。</p>
+            <summary data-i18n="faq4_q">ClaudeSafe 能接管 Claude Desktop 的全部网络流量吗？</summary>
+            <p data-i18n="faq4_a">ClaudeSafe 会通过启动参数和代理环境变量引导 Claude Desktop 的网络请求经过本地 Gatekeeper。应用的部分组件可能使用独立网络实现，因此不能仅凭代理配置保证所有请求均被接管，实际覆盖范围需要独立测试。</p>
           </details>
           <details class="faq-item">
-            <summary>ClaudeSafe 的运行期检查频率是多少？</summary>
-            <p>当前版本每 3 秒检查上游代理端口连通性，每 15 秒检查出口 IP 是否变化。因此异常发生到下一次巡检发现之间可能存在时间窗口，项目不承诺零延迟检测。</p>
+            <summary data-i18n="faq5_q">ClaudeSafe 的运行期检查频率是多少？</summary>
+            <p data-i18n="faq5_a">当前版本每 3 秒检查上游代理端口连通性，每 15 秒检查出口 IP 是否变化。因此异常发生到下一次巡检发现之间可能存在时间窗口，项目不承诺零延迟检测。</p>
           </details>
           <details class="faq-item">
-            <summary>ClaudeSafe 支持哪些系统？</summary>
-            <p>当前发布的程序面向 Windows 10 和 Windows 11 x64，使用 .NET 8 与 WPF 开发，不是原生 macOS 或 Linux 应用。</p>
+            <summary data-i18n="faq6_q">ClaudeSafe 支持哪些系统？</summary>
+            <p data-i18n="faq6_a">当前发布的程序面向 Windows 10 和 Windows 11 x64，使用 .NET 8 与 WPF 开发，不是原生 macOS 或 Linux 应用。</p>
           </details>
         </div>
       </div>
@@ -1872,13 +1875,13 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
       </div>
 
       <div class="footer-links">
-        <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
-        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/latest" target="_blank" rel="noopener noreferrer">最新 Release</a>
-        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.0.2" target="_blank" rel="noopener noreferrer">v1.0.2 发布页</a>
-        <a href="https://github.com/Jelee0145/ClaudeSafe/issues" target="_blank" rel="noopener noreferrer">问题反馈 (Issues)</a>
+        <a href="https://github.com/Jelee0145/ClaudeSafe" target="_blank" rel="noopener noreferrer" data-i18n="ft_repo">GitHub 仓库</a>
+        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/latest" target="_blank" rel="noopener noreferrer" data-i18n="ft_latest">最新 Release</a>
+        <a href="https://github.com/Jelee0145/ClaudeSafe/releases/tag/v1.1.0" target="_blank" rel="noopener noreferrer" data-i18n="ft_rel">v1.1.0 发布页</a>
+        <a href="https://github.com/Jelee0145/ClaudeSafe/issues" target="_blank" rel="noopener noreferrer" data-i18n="ft_issues">问题反馈 (Issues)</a>
       </div>
 
-      <div class="footer-note">
+      <div class="footer-note" data-i18n="ft_note">
         免责声明：ClaudeSafe 仅作为本地网络检测、代理守门与进程保护工具，用于降低意外断流与分流泄漏风险，与 Anthropic / Claude 官方无任何隶属关系。请在遵守服务条款与当地法律法规的前提下使用。
       </div>
     </div>
@@ -1886,6 +1889,144 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
 
   <script>
     (function () {
+      const I18N_EN = {
+        page_title: "ClaudeSafe — Network Safety Launcher & Anti-Leak Gatekeeper for Claude Desktop",
+        nav_checks: "Core Checks",
+        nav_demo: "Interactive Demo",
+        nav_arch: "Architecture",
+        nav_dl: "Download & Verify",
+        nav_download_btn: "Download v1.1.0",
+        hero_badge: "v1.1.0 Released · Bilingual UI · .NET 8 WPF Zero Dependencies",
+        hero_title: "ClaudeSafe — Claude Desktop<span>Network Safety Launcher</span>",
+        hero_desc: "A Windows safety launcher and local proxy gatekeeper for Claude Desktop. It runs 6 pre-flight proxy and exit-IP checks before launch, routes app traffic through a local Gatekeeper proxy, and monitors connectivity and IP changes during runtime—locking controlled traffic on anomalies to reduce accidental direct-connection risks. ClaudeSafe cannot guarantee prevention of account restrictions, and actual traffic coverage depends on the app's own networking stack.",
+        hero_dl_standalone: "Download Standalone .exe (154.7 MB)",
+        hero_dl_fw: "Download Framework-Dependent .zip (394.9 KB)",
+        hero_meta_release: "View v1.1.0 Release Notes →",
+        hero_meta_src: "Browse Source Code →",
+        hero_meta_sha: "SHA256 Checksums",
+        hl1_title: "6-Dimension Pre-Flight Check",
+        hl1_desc: "Proxy / Region / Purity / Drift / Anti-Leak / Timezone",
+        hl2_title: "Runtime Circuit Breaker",
+        hl2_desc: "Locks controlled proxy on proxy drop or IP drift",
+        hl3_title: "Always-On Anti-Direct Guard",
+        hl3_desc: "Firewall outbound block + process watchdog",
+        sim_ext_breaker: "⚡ Test Circuit Breaker",
+        sim_ext_reset: "↺ Reset to Idle Locked State",
+        chk_sec_title: "6-Dimension Pre-Flight Network & Risk Check",
+        chk_sec_sub: "Before allowing any byte to reach Claude Desktop, ClaudeSafe completes six cross-checks and blocks launch if any critical check fails.",
+        chk1_tag: "Channel",
+        chk1_title: "Local Proxy Channel & Mode",
+        chk1_desc: "Reads Windows system proxy settings and scans common local proxy ports (<code>7890</code> / <code>7897</code> / <code>10808</code> / <code>10809</code>, etc.) while detecting TUN adapters and latency.",
+        chk2_tag: "Hard Block",
+        chk2_title: "Exit IP & Region Compliance",
+        chk2_desc: "Probes multiple GeoIP sources to confirm your exit country/region. If the exit falls in restricted/blocked regions (<code>CN</code>, <code>HK</code>, <code>MO</code>, <code>RU</code>, etc.), launch is strictly blocked.",
+        chk3_tag: "Risk Score",
+        chk3_title: "IP Type & Datacenter Purity",
+        chk3_desc: "Detects <code>Hosting</code> / <code>Proxy</code> flags and common cloud/datacenter ASNs to warn about shared-IP risk weights.",
+        chk4_tag: "Drift Guard",
+        chk4_title: "Historical IP Drift Comparison",
+        chk4_desc: "Persists the last safe launch IP, ASN, and country code locally, warning on rapid cross-country jumps.",
+        chk5_tag: "Anti-Leak",
+        chk5_title: "Anthropic Reachability & Split-Tunnel Guard",
+        chk5_desc: "Probes <code>https://claude.ai/cdn-cgi/trace</code> directly through the proxy to catch split-tunnel leaks where GeoIP is proxied but Claude traffic goes <code>DIRECT</code>.",
+        chk6_tag: "Environment",
+        chk6_title: "System Timezone & Conflict Check",
+        chk6_desc: "Checks Windows timezone (UTC offset) consistency against the exit IP region and detects conflicting game boosters.",
+        arch_sec_title: "Local Gatekeeper Proxy & Runtime Circuit Breaker",
+        arch_sec_sub: "Validates proxy and exit environment before launch and monitors the controlled proxy during runtime. Locks the Gatekeeper on anomalies; actual coverage depends on Claude Desktop's internal networking.",
+        pipe_gate_sub: "127.0.0.1:17890 · Locked by default / Cut on anomaly",
+        pipe_up_title: "Upstream Local Proxy",
+        pipe_dest_sub: "claude.ai (Verified Compliant Exit)",
+        pillar1_title: "⚡ Fast Cut on Anomaly",
+        pillar1_desc: "<code>RuntimeWatchdogService</code> polls upstream proxy reachability every 3s and exit IP every 15s, locking <code>GatekeeperProxyServer</code> and severing managed connections on failure.",
+        pillar2_title: "⏳ 5-Min Cooldown & Topmost Alert",
+        pillar2_desc: "Pops up <code>CircuitBreakerWindow</code> on top: choose a 5-minute cooldown lock to fix your VPN and auto-reconnect, or kill all Claude processes immediately.",
+        pillar3_title: "🛡️ Clean Exit & Anti-Direct Guard",
+        pillar3_desc: "Blocks unverified direct launches via firewall, Hosts blackhole (Admin mode), and watchdog; cleanly restores all proxy, firewall, and Hosts settings on exit. Hold the Logo for 1s to unlock 3P mode.",
+        dl_sec_title: "Download ClaudeSafe v1.1.0 & Verify Checksums",
+        dl_sec_sub: "All binaries are hosted on GitHub Releases, built natively with .NET 8 WPF, with bilingual UI and zero third-party runtime dependencies.",
+        dl1_badge: "Recommended · Out of the Box",
+        dl1_title: "Windows x64 Standalone (.exe)",
+        dl1_s1: "Includes .NET 8 Windows Desktop Runtime — no extra setup needed",
+        dl1_s2: "Single executable file — double-click to run and guard",
+        dl1_s3: "Supported OS: Windows 10 / Windows 11 (x64)",
+        dl1_btn: "Download Standalone from GitHub",
+        dl2_badge: "Lightweight · Requires .NET 8 Desktop Runtime",
+        dl2_title: "Framework-Dependent (.zip)",
+        dl2_s1: "Only ~395 KB — contains main executable and runtime config (4 files)",
+        dl2_s2: "Requires Microsoft .NET 8 Desktop Runtime pre-installed",
+        dl2_s3: "Extract anywhere and run <code>ClaudeSafe.exe</code>",
+        dl2_btn: "Download Archive from GitHub",
+        dl_copy: "Copy SHA256",
+        cli_sha_title: "Verify SHA256 in PowerShell",
+        cli_build_title: "Build & Self-Test from Source",
+        faq_sec_title: "Frequently Asked Questions",
+        faq_sec_sub: "Purpose, OS support, traffic coverage, and usage boundaries of ClaudeSafe.",
+        faq1_q: "What is ClaudeSafe?",
+        faq1_a: "ClaudeSafe is an open-source Windows safety launcher for Claude Desktop. It checks proxy and exit network status before launch, routes requests via a local Gatekeeper proxy, and locks controlled connections if runtime checks detect anomalies.",
+        faq2_q: "Is ClaudeSafe an official Anthropic product?",
+        faq2_a: "No. ClaudeSafe is an independent community project and is not affiliated with, endorsed by, or supported by Anthropic.",
+        faq3_q: "Can ClaudeSafe guarantee my Claude account won't be banned?",
+        faq3_a: "No. ClaudeSafe focuses on local network diagnostics, proxy monitoring, and reducing accidental direct connections. Account eligibility and enforcement are determined solely by the service provider.",
+        faq4_q: "Does ClaudeSafe capture all Claude Desktop traffic?",
+        faq4_a: "ClaudeSafe configures proxy arguments, environment variables, and a local Gatekeeper. Some app components may use their own networking stack, so complete coverage requires independent testing.",
+        faq5_q: "How often does ClaudeSafe check the connection at runtime?",
+        faq5_a: "It polls upstream proxy reachability every 3 seconds and exit IP every 15 seconds. A brief window may exist between an actual network drop and the next poll.",
+        faq6_q: "Which operating systems are supported?",
+        faq6_a: "Published binaries target Windows 10 and Windows 11 (x64), built with .NET 8 and WPF. macOS and Linux are not supported.",
+        ft_repo: "GitHub Repo",
+        ft_latest: "Latest Release",
+        ft_rel: "v1.1.0 Release",
+        ft_issues: "Issues",
+        ft_note: "Disclaimer: ClaudeSafe is a local network diagnostics, proxy gatekeeper, and process guard utility designed to reduce accidental direct connections and split-tunnel leaks. It is not affiliated with Anthropic / Claude. Use in compliance with applicable terms of service and local laws."
+      };
+
+      const I18N_ZH = { page_title: document.title };
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        I18N_ZH[el.dataset.i18n] = el.textContent;
+      });
+      document.querySelectorAll("[data-i18n-html]").forEach(el => {
+        I18N_ZH[el.dataset.i18nHtml] = el.innerHTML;
+      });
+
+      const savedLang = localStorage.getItem("claudesafe_lang");
+      let currentLang = (savedLang === "en" || savedLang === "zh")
+        ? savedLang
+        : ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+
+      const isEn = () => currentLang === "en";
+      const t = (zh, en) => (isEn() ? en : zh);
+
+      function applyPageLanguage() {
+        const dict = isEn() ? I18N_EN : I18N_ZH;
+        document.documentElement.lang = isEn() ? "en" : "zh-CN";
+        document.title = dict.page_title;
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+          const k = el.dataset.i18n;
+          if (dict[k] !== undefined) el.textContent = dict[k];
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach(el => {
+          const k = el.dataset.i18nHtml;
+          if (dict[k] !== undefined) el.innerHTML = dict[k];
+        });
+        const langBtn = document.getElementById("langToggleBtn");
+        if (langBtn) {
+          langBtn.textContent = isEn() ? "🌐 中文" : "🌐 English";
+        }
+      }
+
+      const langToggleBtn = document.getElementById("langToggleBtn");
+      if (langToggleBtn) {
+        langToggleBtn.addEventListener("click", () => {
+          currentLang = isEn() ? "zh" : "en";
+          localStorage.setItem("claudesafe_lang", currentLang);
+          applyPageLanguage();
+          if (typeof render === "function") render();
+        });
+      }
+
+      applyPageLanguage();
+
       const STARBURST_PATH = "M46.8,10 L53.2,10 L52.2,41.5 L72.5,17.2 L77.5,21.4 L55.8,44.4 L87.2,36.2 L88.8,42.4 L57.1,49.1 L85.5,64.8 L82.3,70.4 L54.6,53.4 L67.8,83.4 L61.9,85.9 L50,55.8 L38.1,85.9 L32.2,83.4 L45.4,53.4 L17.7,70.4 L14.5,64.8 L42.9,49.1 L11.2,42.4 L12.8,36.2 L44.2,44.4 L22.5,21.4 L27.5,17.2 L47.8,41.5 Z";
 
       const BLOCKED_COUNTRIES = new Set(["CN", "HK", "MO", "RU", "BY", "KP", "IR", "SY", "CU"]);
@@ -2734,29 +2875,32 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
         }
 
         if (simState === "cooldown") {
-          hintBar.textContent = "已进入 5 分钟冷静期保护：保持断网并保留对话现场，修复代理后点击「重新检测并恢复连接」即可恢复。";
+          hintBar.textContent = t(
+            "已进入 5 分钟冷静期保护：保持断网并保留对话现场，修复代理后点击「重新检测并恢复连接」即可恢复。",
+            "Entered 5-min cooldown: traffic is locked while keeping Claude open. Fix your proxy and click Re-Check & Restore."
+          );
           const midCooldownHtml = lastRealReport && lastRealReport.capsules
-            ? renderCapsules(lastRealReport.capsules) + `<div class="wpf-summary-box">已锁定所有代理流量并保留 Claude 对话现场。修复代理节点后，点击下方按钮重新检测即可无损恢复连接。</div>`
-            : `<div class="wpf-empty-hint"><span style="font-size:22px;">⏳</span><span>已锁定所有代理流量并保留 Claude 对话现场。<br/>请先修复本地代理节点，然后点击下方「重新检测并恢复连接」。</span></div>`;
+            ? renderCapsules(lastRealReport.capsules) + `<div class="wpf-summary-box">${t("已锁定所有代理流量并保留 Claude 对话现场。修复代理节点后，点击下方按钮重新检测即可无损恢复连接。", "All proxy traffic locked while preserving Claude session. Fix your node and re-check below to resume.")}</div>`
+            : `<div class="wpf-empty-hint"><span style="font-size:22px;">⏳</span><span>${t("已锁定所有代理流量并保留 Claude 对话现场。<br/>请先修复本地代理节点，然后点击下方「重新检测并恢复连接」。", "All proxy traffic locked while preserving Claude session.<br/>Fix your local proxy and click Re-Check & Restore below.")}</span></div>`;
 
           host.innerHTML = `
             <div class="wpf-window">
-              ${titleBarMarkup("#D97706", "熔断冷静期 · 阀门锁死")}
+              ${titleBarMarkup("#D97706", t("熔断冷静期 · 阀门锁死", "Cooldown · Gate Locked"))}
               <div class="wpf-hero-top">
                 ${logoMarkup("#D97757", 0, 0, false)}
-                <div class="wpf-main-status" style="color:#D97706;">5 分钟冷静期锁定中</div>
+                <div class="wpf-main-status" style="color:#D97706;">${t("5 分钟冷静期锁定中", "5-Min Cooldown Lock Active")}</div>
                 <div class="wpf-pills-row">
-                  <span class="wpf-ip-pill danger">⚡ 代理断开 · 流量已锁定</span>
+                  <span class="wpf-ip-pill danger">${t("⚡ 代理断开 · 流量已锁定", "⚡ Proxy Dropped · Traffic Locked")}</span>
                   <span class="wpf-cooldown-pill" id="cooldownTimerText">⏳ ${formatMmSs(cooldownSeconds)}</span>
                 </div>
               </div>
               <div class="wpf-mid-card">${midCooldownHtml}</div>
               <div class="wpf-footer">
-                <button class="wpf-primary-btn" type="button" id="cooldownRecoverBtn">重新检测并恢复连接</button>
-                <button class="wpf-secondary-kill-btn" type="button" id="cooldownKillBtn">封锁并立即退出 Claude</button>
+                <button class="wpf-primary-btn" type="button" id="cooldownRecoverBtn">${t("重新检测并恢复连接", "Re-Check & Restore Connection")}</button>
+                <button class="wpf-secondary-kill-btn" type="button" id="cooldownKillBtn">${t("封锁并立即退出 Claude", "Lock & Kill Claude Immediately")}</button>
                 <div class="wpf-bottom-row">
-                  <span>⏳ 保持断网等待修复 · 关窗后台守护</span>
-                  <span class="wpf-settings-chip">⚙ 设置</span>
+                  <span>${t("⏳ 保持断网等待修复 · 关窗后台守护", "⏳ Waiting for recovery · Close hides to tray")}</span>
+                  <span class="wpf-settings-chip">${t("⚙ 设置", "⚙ Settings")}</span>
                 </div>
               </div>
             </div>
@@ -2785,11 +2929,11 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
         }
 
         // MainWindow normal lifecycle states: locked | checking | launching | running | blocked | unlocked3p
-        let adminLabel = "标准守护 · 点此开启禁直连";
+        let adminLabel = t("标准守护 · 点此开启禁直连", "Standard · Enable Anti-Direct");
         let adminTone = "";
-        let statusTitle = "已开启流量封锁 · 待安全启动";
+        let statusTitle = t("已开启流量封锁 · 待安全启动", "Traffic Locked · Ready to Check");
         let statusColor = "#141413";
-        let ipText = "🌐 出口 IP：点击下方按钮开始检测";
+        let ipText = t("🌐 出口 IP：点击下方按钮开始检测", "🌐 Exit IP: Click below to check");
         let ipPillClass = "wpf-ip-pill";
         let showRecheckChip = false;
         let dotColor = "#D97757";
@@ -2799,16 +2943,19 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
         let midHtml = `
           <div class="wpf-empty-hint">
             <span style="font-size:22px;">🛡️</span>
-            <span>点击下方按钮后，将实时检测您当前的代理端口、真实出口 IP、地区合规与 claude.ai 连通性。</span>
+            <span>${t("点击下方按钮后，将实时检测您当前的代理端口、真实出口 IP、地区合规与 claude.ai 连通性。", "Click below to inspect your local proxy port, real exit IP, region compliance, and claude.ai reachability.")}</span>
           </div>
         `;
-        let btnText = "检测网络并安全启动";
+        let btnText = t("检测网络并安全启动", "Check Network & Launch Safely");
         let btnClass = "wpf-primary-btn";
         let btnDisabled = "";
-        let footerLeftText = "长按 Logo 1 秒解锁 3P 模式 · 关窗后台守护";
+        let footerLeftText = t("长按 Logo 1 秒解锁 3P 模式 · 关窗后台守护", "Hold Logo 1s for 3P mode · Close hides to tray");
 
         if (simState === "locked") {
-          hintBar.textContent = "提示：点击「检测网络并安全启动」将真实探测出口 IP 与 claude.ai 连通性；通过后自动进入「受控安全运行中」，长按 Logo 1 秒可解锁 3P 模式。";
+          hintBar.textContent = t(
+            "提示：点击「检测网络并安全启动」将真实探测出口 IP 与 claude.ai 连通性；通过后自动进入「受控安全运行中」，长按 Logo 1 秒可解锁 3P 模式。",
+            "Tip: Click 'Check Network & Launch Safely' to probe your real exit IP and claude.ai reachability. Hold the Logo for 1s to unlock 3P mode."
+          );
         } else if (simState === "checking") {
           allowHoldUnlock = false;
           const p = checkProgress || {
@@ -2919,7 +3066,7 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
               <div class="wpf-main-status" style="color:${statusColor};">${statusTitle}</div>
               <div class="wpf-pills-row">
                 <span class="${ipPillClass}">${escapeHtml(ipText)}</span>
-                ${showRecheckChip ? `<button class="wpf-recheck-chip" type="button" id="idleRecheckChip" title="重新执行真实 6 维网络检测">🔄 重新检测</button>` : ""}
+                ${showRecheckChip ? `<button class="wpf-recheck-chip" type="button" id="idleRecheckChip" title="${t("重新执行真实 6 维网络检测", "Re-run 6-dimension network check")}">${t("🔄 重新检测", "🔄 Re-Check")}</button>` : ""}
               </div>
             </div>
             <div class="wpf-mid-card">${midHtml}</div>
@@ -2927,7 +3074,7 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
               <button class="${btnClass}" type="button" id="idlePrimaryBtn" ${btnDisabled}>${btnText}</button>
               <div class="wpf-bottom-row">
                 <span>${escapeHtml(footerLeftText)}</span>
-                <span class="wpf-settings-chip">⚙ 设置</span>
+                <span class="wpf-settings-chip">${t("⚙ 设置", "⚙ Settings")}</span>
               </div>
             </div>
           </div>
@@ -2983,14 +3130,14 @@ dotnet run --project src/ClaudeSafe -- --self-test</pre>
           const val = btn.dataset.copy;
           try {
             await navigator.clipboard.writeText(val);
-            btn.textContent = "已复制 ✓";
+            btn.textContent = t("已复制 ✓", "Copied ✓");
             btn.classList.add("copied");
             setTimeout(() => {
-              btn.textContent = "复制校验码";
+              btn.textContent = t("复制校验码", "Copy SHA256");
               btn.classList.remove("copied");
             }, 1800);
           } catch {
-            btn.textContent = "请手动复制";
+            btn.textContent = t("请手动复制", "Copy manually");
           }
         });
       });
