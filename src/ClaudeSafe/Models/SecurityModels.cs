@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ClaudeSafe.Localization;
 
 namespace ClaudeSafe.Models;
 
@@ -49,6 +50,7 @@ public sealed class CheckItemResult
     public string ShortStatus { get; set; } = string.Empty;
     public string Detail { get; set; } = string.Empty;
     public string Recommendation { get; set; } = string.Empty;
+    public bool IsCrossCountryDrift { get; set; }
 
     public bool IsIssue => RiskLevel is RiskLevel.Warning or RiskLevel.Danger;
     public string DisplayShortTitle => string.IsNullOrWhiteSpace(ShortTitle) ? Title : ShortTitle;
@@ -64,10 +66,10 @@ public sealed class CheckItemResult
 
     public string RiskBadgeText => RiskLevel switch
     {
-        RiskLevel.Safe => "安全",
-        RiskLevel.Warning => "警告",
-        RiskLevel.Danger => "高危阻断",
-        _ => "待检测"
+        RiskLevel.Safe => L.Get("Risk_Safe"),
+        RiskLevel.Warning => L.Get("Risk_Warning"),
+        RiskLevel.Danger => L.Get("Risk_Danger"),
+        _ => L.Get("Risk_Pending")
     };
 }
 
@@ -98,7 +100,7 @@ public sealed class IpGeoInfo
             if (!string.IsNullOrWhiteSpace(Region)) parts.Add(Region);
             if (!string.IsNullOrWhiteSpace(City) && !string.Equals(City, Region, StringComparison.OrdinalIgnoreCase))
                 parts.Add(City);
-            return parts.Count > 0 ? string.Join(" · ", parts) : "未知地区";
+            return parts.Count > 0 ? string.Join(" · ", parts) : L.Get("Common_UnknownLocation");
         }
     }
 }
@@ -164,6 +166,7 @@ public sealed class AppConfig
     public bool BlockUnauthorizedClaudeLaunch { get; set; } = true;
     public bool LaunchOnWindowsStartup { get; set; } = false;
     public int CooldownDurationSeconds { get; set; } = 300;
+    public string Language { get; set; } = L.Auto;
     public HistoricalIpRecord? LastSafeIpRecord { get; set; }
     public List<HistoricalIpRecord> IpHistory { get; set; } = new();
 }

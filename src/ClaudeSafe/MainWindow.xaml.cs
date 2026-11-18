@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Models;
 using ClaudeSafe.Services;
 using ClaudeSafe.Views;
@@ -35,6 +36,9 @@ public partial class MainWindow : Window
     private PreFlightReport? _lastReport;
     private CancellationTokenSource? _checkCts;
     private WinForms.NotifyIcon? _trayIcon;
+    private WinForms.ToolStripMenuItem? _trayOpenItem;
+    private WinForms.ToolStripMenuItem? _trayLockExitItem;
+    private WinForms.ToolStripMenuItem? _trayExitItem;
     private System.Drawing.Icon? _trayCustomIcon;
     private bool _isExplicitExit;
     private bool _isClosingOrClosed;
@@ -74,8 +78,13 @@ public partial class MainWindow : Window
 
         RiskItemsList.ItemsSource = _checkItems;
         IssueItemsList.ItemsSource = _issueItems;
-        Closed += (_, _) => _isClosingOrClosed = true;
+        Closed += (_, _) =>
+        {
+            _isClosingOrClosed = true;
+            L.LanguageChanged -= OnLanguageChanged;
+        };
 
+        L.LanguageChanged += OnLanguageChanged;
         WireEvents();
         InitializeTrayIcon();
     }
@@ -101,8 +110,8 @@ public partial class MainWindow : Window
         _watchdog.OnCooldownExpired += () => Dispatcher.BeginInvoke(() =>
         {
             if (IsClosingOrClosed) return;
-            ShowTrayBalloon("冷静期已结束", "超时未恢复安全网络，已自动退出 Claude 并继续封锁流量。", WinForms.ToolTipIcon.Warning);
-            AppendLog("⏳ 冷静期倒计时结束，已自动清理 Claude 进程并保持封锁。");
+            ShowTrayBalloon(L.Get("Balloon_CooldownExpiredTitle"), L.Get("Balloon_CooldownExpiredText"), WinForms.ToolTipIcon.Warning);
+            AppendLog(L.Get("Log_CooldownExpired"));
         });
 
         _watchdog.OnCooldownAutoRecovered += (report, resumedRunningClaude) => Dispatcher.BeginInvoke(() =>
@@ -119,23 +128,23 @@ public partial class MainWindow : Window
 
             var ipLabel = report.ExitIpInfo != null
                 ? $"{report.ExitIpInfo.Ip} ({report.ExitIpInfo.CountryCode})"
-                : "安全节点";
+                : L.Get("Balloon_SafeNode");
             ShowTrayBalloon(
-                resumedRunningClaude ? "✅ 网络已恢复，Claude 连接已自动重连" : "✅ 网络已恢复，已解除熔断锁定",
-                $"当前出口：{ipLabel}。可继续安全使用 Claude。",
+                resumedRunningClaude ? L.Get("Balloon_RecoveredResumedTitle") : L.Get("Balloon_RecoveredUnlockedTitle"),
+                L.Format("Balloon_RecoveredText", ipLabel),
                 WinForms.ToolTipIcon.Info);
         });
 
         _watchdog.OnClaudeExitedCleanly += msg => Dispatcher.BeginInvoke(() =>
         {
             if (IsClosingOrClosed || _isExitPromptOpen) return;
-            ShowTrayBalloon("Claude 已退出并自动封锁", msg, WinForms.ToolTipIcon.Info);
+            ShowTrayBalloon(L.Get("Balloon_ClaudeExitedTitle"), msg, WinForms.ToolTipIcon.Info);
         });
 
         _watchdog.OnUnauthorizedLaunchBlocked += msg => Dispatcher.BeginInvoke(() =>
         {
             if (IsClosingOrClosed || _isExitPromptOpen) return;
-            ShowTrayBalloon("防裸连拦截已触发", msg, WinForms.ToolTipIcon.Error);
+            ShowTrayBalloon(L.Get("Balloon_UnauthorizedTitle"), msg, WinForms.ToolTipIcon.Error);
             RestoreAndFocusWindow();
         });
     }
@@ -143,23 +152,63 @@ public partial class MainWindow : Window
     private void InitializeTrayIcon()
     {
         var menu = new WinForms.ContextMenuStrip();
-        menu.Items.Add("打开 ClaudeSafe 窗口", null, (_, _) => Dispatcher.BeginInvoke(RestoreAndFocusWindow));
-        menu.Items.Add("封锁并安全退出 Claude", null, (_, _) => Dispatcher.BeginInvoke(() =>
+        _trayOpenItem = new WinForms.ToolStripMenuItem(L.Get("Tray_OpenWindow"), null, (_, _) => Dispatcher.BeginInvoke(RestoreAndFocusWindow));
+        _trayLockExitItem = new WinForms.ToolStripMenuItem(L.Get("Tray_LockAndExitClaude"), null, (_, _) => Dispatcher.BeginInvoke(() =>
         {
-            _watchdog.CleanExitClaudeAndLockAll("托盘菜单手动封锁并安全退出 Claude");
+            _watchdog.CleanExitClaudeAndLockAll(L.Get("Tray_LockFromMenuLog"));
         }));
+        _trayExitItem = new WinForms.ToolStripMenuItem(L.Get("Tray_ExitCompletely"), null, (_, _) => Dispatcher.BeginInvoke(ExitApplicationCompletely));
+
+        menu.Items.Add(_trayOpenItem);
+        menu.Items.Add(_trayLockExitItem);
         menu.Items.Add(new WinForms.ToolStripSeparator());
-        menu.Items.Add("彻底退出后台守护", null, (_, _) => Dispatcher.BeginInvoke(ExitApplicationCompletely));
+        menu.Items.Add(_trayExitItem);
 
         _trayCustomIcon = LoadTrayIcon();
         _trayIcon = new WinForms.NotifyIcon
         {
             Icon = _trayCustomIcon ?? System.Drawing.SystemIcons.Shield,
-            Text = "ClaudeSafe - 后台安全守护中",
+            Text = L.Get("Tray_Tooltip"),
             Visible = true,
             ContextMenuStrip = menu
         };
         _trayIcon.DoubleClick += (_, _) => Dispatcher.BeginInvoke(RestoreAndFocusWindow);
+    }
+
+    private void UpdateTrayIconTexts()
+    {
+        if (_trayOpenItem != null) _trayOpenItem.Text = L.Get("Tray_OpenWindow");
+        if (_trayLockExitItem != null) _trayLockExitItem.Text = L.Get("Tray_LockAndExitClaude");
+        if (_trayExitItem != null) _trayExitItem.Text = L.Get("Tray_ExitCompletely");
+        if (_trayIcon != null) _trayIcon.Text = L.Get("Tray_Tooltip");
+    }
+
+    private void OnLanguageChanged()
+    {
+        if (IsClosingOrClosed) return;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (IsClosingOrClosed) return;
+            UpdateTrayIconTexts();
+            UpdateAdminBadgeUi();
+            UpdateIpBaselineSummaryUi();
+            ApplyStateUi(_watchdog.State);
+
+            if (_lastReport != null)
+            {
+                _lastReport.CheckItems = _networkCheck.EvaluateRiskItems(
+                    _lastReport.ProxyProbe,
+                    _lastReport.ExitIpInfo,
+                    _lastReport.AnthropicReachable,
+                    _lastReport.AnthropicTraceCountry,
+                    _config);
+                ApplyReportToUi(_lastReport);
+            }
+            else
+            {
+                IpPillText.Text = L.Get("Main_IpPillDefault");
+            }
+        });
     }
 
     private static System.Drawing.Icon? LoadTrayIcon()
@@ -204,6 +253,7 @@ public partial class MainWindow : Window
         ChkBlockUnauthorized.IsChecked = _config.BlockUnauthorizedClaudeLaunch;
         ChkAutoStart.IsChecked = _configService.IsWindowsStartupEnabled();
         SelectCooldownComboItem(_config.CooldownDurationSeconds);
+        SelectLanguageComboItem(_config.Language);
         UpdateIpBaselineSummaryUi();
 
         UpdateAdminBadgeUi();
@@ -215,7 +265,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            AppendLog($"❌ 守门代理端口 {_config.GatekeeperPort} 绑定失败（自动分配空闲端口）: {ex.Message}");
+            AppendLog(L.Format("Log_GatePortFallback", _config.GatekeeperPort, ex.Message));
             _gatekeeper.Start(0);
             _config.GatekeeperPort = _gatekeeper.ListeningPort;
             TxtGatekeeperPort.Text = _config.GatekeeperPort.ToString();
@@ -225,16 +275,16 @@ public partial class MainWindow : Window
         // 2. 启动即应用常态流量封锁（动态 PAC 仅拦截 Claude，不影响其他普通网站直连）
         _gatekeeper.SetUpstreamEndpoint(_config.UpstreamProxyHost, _config.UpstreamProxyPort, false);
         var sysProxyRes = _systemProxy.CaptureBackupAndApplyGatekeeper(_gatekeeper.ListeningPort, isGateOpen: false);
-        AppendLog($"系统 PAC 接管：{sysProxyRes.Message}");
+        AppendLog(L.Format("Log_PacApply", sysProxyRes.Message));
 
         var observedPaths = _processService.CollectObservedExecutablePaths();
         var initFw = _firewall.ApplyTrafficBlock(observedPaths, _config.EnableFirewallRule, _config.EnableHostsBlock);
-        AppendLog($"初始安全封锁：{initFw.Message}");
+        AppendLog(L.Format("Log_InitBlock", initFw.Message));
 
         // 3. 若启动前已有残余未经许可的 Claude 进程，立即安全清理
         if (_processService.GetRunningClaudeProcessCount() > 0)
         {
-            _watchdog.CleanExitClaudeAndLockAll("启动时发现未受保护运行的 Claude 进程，已自动清理并封锁");
+            _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_LeftoverClaude"));
         }
 
         // 4. 启动后台运行期看门狗
@@ -260,8 +310,8 @@ public partial class MainWindow : Window
         {
             BtnAdminMini.Background = CreateBrush("#E7F6EE");
             BtnAdminMini.IsEnabled = false;
-            BtnAdminMini.ToolTip = "已以管理员运行，Windows 内核级禁直连防火墙与 Hosts 封锁已激活";
-            AdminMiniText.Text = "管理员 · 禁直连已开启";
+            BtnAdminMini.ToolTip = L.Get("Admin_TipActive");
+            AdminMiniText.Text = L.Get("Admin_BadgeActive");
             AdminMiniText.Foreground = CreateBrush("#18794E");
             BtnRestartAdmin.Visibility = Visibility.Collapsed;
         }
@@ -269,8 +319,8 @@ public partial class MainWindow : Window
         {
             BtnAdminMini.Background = CreateBrush("#FEF3C7");
             BtnAdminMini.IsEnabled = true;
-            BtnAdminMini.ToolTip = "点击以管理员身份重启，启用 Windows 内核级禁止 Claude 直连防火墙";
-            AdminMiniText.Text = "标准守护 · 点此开启禁直连";
+            BtnAdminMini.ToolTip = L.Get("Admin_TipStandard");
+            AdminMiniText.Text = L.Get("Admin_BadgeStandard");
             AdminMiniText.Foreground = CreateBrush("#B45309");
             BtnRestartAdmin.Visibility = Visibility.Visible;
         }
@@ -279,9 +329,9 @@ public partial class MainWindow : Window
     private void UpdateGatekeeperStatusUi()
     {
         var gateStatus = _gatekeeper.IsManualBypass
-            ? "3P 临时解锁"
-            : (_gatekeeper.IsGateOpen ? "已放行 Claude" : "已锁死 Claude");
-        GatekeeperStatsText.Text = $"守门端口 127.0.0.1:{_gatekeeper.ListeningPort} [{gateStatus}] · 已拦截 {_gatekeeper.BlockedRequestsCount} 次";
+            ? L.Get("Gate_StatusBypass")
+            : (_gatekeeper.IsGateOpen ? L.Get("Gate_StatusOpen") : L.Get("Gate_StatusLocked"));
+        GatekeeperStatsText.Text = L.Format("Gate_StatsFormat", _gatekeeper.ListeningPort, gateStatus, _gatekeeper.BlockedRequestsCount);
     }
 
     private void ApplyStateUi(AppProtectionState state)
@@ -305,57 +355,57 @@ public partial class MainWindow : Window
             case AppProtectionState.ReadyToLaunch:
                 TitleDot.Fill = CreateBrush(state == AppProtectionState.ReadyToLaunch ? "#18794E" : "#D97757");
                 MainStatusTitle.Text = state == AppProtectionState.ReadyToLaunch
-                    ? (_lastReport?.HasWarnings == true ? "检测完成（含风险提醒）" : "网络环境安全 · 可启动")
-                    : "已开启流量封锁 · 待安全启动";
+                    ? (_lastReport?.HasWarnings == true ? L.Get("State_ReadyWarnings") : L.Get("State_ReadySafe"))
+                    : L.Get("State_LockedIdle");
                 BtnPrimaryAction.Style = (Style)FindResource("PrimaryClaudeButtonStyle");
-                BtnPrimaryAction.Content = "检测网络并安全启动";
+                BtnPrimaryAction.Content = L.Get("State_BtnCheckAndLaunch");
                 BtnPrimaryAction.IsEnabled = !_isLaunchingOrChecking;
-                FooterHintText.Text = "长按 Logo 1 秒解锁 3P 模式 · 关窗后台守护";
+                FooterHintText.Text = L.Get("State_FooterIdle");
                 break;
 
             case AppProtectionState.Checking:
                 TitleDot.Fill = CreateBrush("#D97757");
-                MainStatusTitle.Text = "正在检测网络与风险项...";
+                MainStatusTitle.Text = L.Get("State_CheckingTitle");
                 BtnPrimaryAction.Style = (Style)FindResource("PrimaryClaudeButtonStyle");
-                BtnPrimaryAction.Content = "正在检测网络并准备启动...";
+                BtnPrimaryAction.Content = L.Get("State_CheckingBtn");
                 BtnPrimaryAction.IsEnabled = false;
-                FooterHintText.Text = "🛡️ 后台守护运行中 · 关窗不退出";
+                FooterHintText.Text = L.Get("State_FooterDaemon");
                 break;
 
             case AppProtectionState.RunningProtected:
                 TitleDot.Fill = CreateBrush("#18794E");
-                MainStatusTitle.Text = "Claude 受控安全运行中";
+                MainStatusTitle.Text = L.Get("State_RunningTitle");
                 BtnPrimaryAction.Style = (Style)FindResource("DangerClaudeButtonStyle");
-                BtnPrimaryAction.Content = "封锁并安全退出";
+                BtnPrimaryAction.Content = L.Get("State_RunningBtn");
                 BtnPrimaryAction.IsEnabled = true;
-                FooterHintText.Text = "🛡️ 运行期断流熔断守护中 · 关窗不退出";
+                FooterHintText.Text = L.Get("State_FooterRunning");
                 break;
 
             case AppProtectionState.ManualUnlocked:
                 TitleDot.Fill = CreateBrush("#D97706");
-                MainStatusTitle.Text = "已临时解锁 · 3P 自由启动模式";
+                MainStatusTitle.Text = L.Get("State_UnlockedTitle");
                 BtnPrimaryAction.Style = (Style)FindResource("DangerClaudeButtonStyle");
-                BtnPrimaryAction.Content = "重新上锁并恢复封锁";
+                BtnPrimaryAction.Content = L.Get("State_UnlockedBtn");
                 BtnPrimaryAction.IsEnabled = true;
-                FooterHintText.Text = "🔓 已暂时放行 3P 模式 · 完成后请点上方恢复封锁";
+                FooterHintText.Text = L.Get("State_FooterUnlocked");
                 break;
 
             case AppProtectionState.CircuitBreakerTripped:
                 TitleDot.Fill = CreateBrush("#C93B2B");
-                MainStatusTitle.Text = "网络异常 · 流量已毫秒级熔断";
+                MainStatusTitle.Text = L.Get("State_TrippedTitle");
                 BtnPrimaryAction.Style = (Style)FindResource("PrimaryClaudeButtonStyle");
-                BtnPrimaryAction.Content = "重新检测并恢复连接";
+                BtnPrimaryAction.Content = L.Get("State_RecoverBtn");
                 BtnPrimaryAction.IsEnabled = true;
-                FooterHintText.Text = "🚨 流量已物理切断 · 关窗后台守护";
+                FooterHintText.Text = L.Get("State_FooterTripped");
                 break;
 
             case AppProtectionState.CooldownLocked:
                 TitleDot.Fill = CreateBrush("#D97706");
-                MainStatusTitle.Text = "5 分钟冷静期锁定中";
+                MainStatusTitle.Text = L.Format("State_CooldownTitle", Math.Max(1, _config.CooldownDurationSeconds / 60));
                 BtnPrimaryAction.Style = (Style)FindResource("PrimaryClaudeButtonStyle");
-                BtnPrimaryAction.Content = "重新检测并恢复连接";
+                BtnPrimaryAction.Content = L.Get("State_RecoverBtn");
                 BtnPrimaryAction.IsEnabled = true;
-                FooterHintText.Text = "⏳ 保持断网等待修复 · 关窗后台守护";
+                FooterHintText.Text = L.Get("State_FooterCooldown");
                 break;
         }
 
@@ -404,15 +454,30 @@ public partial class MainWindow : Window
         CmbCooldownMinutes.SelectedIndex = 2; // 默认 5 分钟
     }
 
+    private void SelectLanguageComboItem(string? language)
+    {
+        var normalized = L.NormalizeSetting(language);
+        foreach (var obj in CmbLanguage.Items)
+        {
+            if (obj is ComboBoxItem item &&
+                string.Equals(item.Tag?.ToString(), normalized, StringComparison.OrdinalIgnoreCase))
+            {
+                CmbLanguage.SelectedItem = item;
+                return;
+            }
+        }
+        CmbLanguage.SelectedIndex = 0;
+    }
+
     private void UpdateIpBaselineSummaryUi()
     {
         if (_config.LastSafeIpRecord != null && !string.IsNullOrWhiteSpace(_config.LastSafeIpRecord.Ip))
         {
-            TxtIpBaselineSummary.Text = $"IP 基线：{_config.LastSafeIpRecord.Ip} ({_config.LastSafeIpRecord.CountryCode})";
+            TxtIpBaselineSummary.Text = L.Format("Settings_IpBaselineValue", _config.LastSafeIpRecord.Ip, _config.LastSafeIpRecord.CountryCode);
         }
         else
         {
-            TxtIpBaselineSummary.Text = "IP 基线：暂无记录";
+            TxtIpBaselineSummary.Text = L.Get("Settings_IpBaselineEmpty");
         }
     }
 
@@ -432,7 +497,7 @@ public partial class MainWindow : Window
         }
 
         BtnOnlyCheck.IsEnabled = false;
-        AppendLog("🔍 开始执行 6 维网络与风控体检...");
+        AppendLog(L.Get("Log_CheckStart"));
 
         try
         {
@@ -453,12 +518,12 @@ public partial class MainWindow : Window
                 TxtProxyHost.Text = _config.UpstreamProxyHost;
                 TxtProxyPort.Text = _config.UpstreamProxyPort.ToString();
                 _configService.Save(_config);
-                AppendLog($"✨ 已自动定位可用本地代理: {report.ProxyProbe.SourceDescription}");
+                AppendLog(L.Format("Log_AutoLocatedProxy", report.ProxyProbe.SourceDescription));
             }
 
             ApplyReportToUi(report);
 
-            AppendLog($"体检结果：{report.Summary}");
+            AppendLog(L.Format("Log_CheckSummary", report.Summary));
 
             if (!preserveCooldownState && _watchdog.State == AppProtectionState.Checking)
             {
@@ -473,7 +538,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            AppendLog($"❌ 体检异常: {ex.Message}");
+            AppendLog(L.Format("Log_CheckError", ex.Message));
             if (!preserveCooldownState)
                 _watchdog.SetState(AppProtectionState.LockedIdle);
             return null;
@@ -511,8 +576,8 @@ public partial class MainWindow : Window
             IssueScrollBox.Visibility = Visibility.Collapsed;
             AllSafeSummaryBox.Visibility = Visibility.Visible;
             AllSafeSummaryText.Text = _firewall.IsRunningAsAdmin()
-                ? "🛡️ 6 项检测全绿 · 已开启「仅走代理、禁止直连」防火墙保护"
-                : "6 项检测全部安全（悬停上方胶囊可看详情）\n提示：点击顶部黄色标签提权，可额外开启防火墙禁止 Claude 直连";
+                ? L.Get("Main_AllSafeAdmin")
+                : L.Get("Main_AllSafeStandard");
         }
 
         if (report.ExitIpInfo != null && !string.IsNullOrWhiteSpace(report.ExitIpInfo.Ip))
@@ -524,7 +589,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            IpPillText.Text = "🌐 未检测到可用海外代理出口";
+            IpPillText.Text = L.Get("Main_IpPillUnavailable");
             IpPillBorder.Background = CreateBrush("#FEF2F2");
             IpPillBorder.BorderBrush = CreateBrush("#FECACA");
             IpPillText.Foreground = CreateBrush("#C93B2B");
@@ -536,14 +601,14 @@ public partial class MainWindow : Window
         // 运行中 -> 一键封锁并安全退出
         if (_watchdog.State == AppProtectionState.RunningProtected)
         {
-            _watchdog.CleanExitClaudeAndLockAll("用户点击【封锁并安全退出】");
+            _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_BtnClickLockExit"));
             return;
         }
 
         // 3P 临时解锁态 -> 重新上锁并恢复安全封锁
         if (_watchdog.State == AppProtectionState.ManualUnlocked)
         {
-            _watchdog.CleanExitClaudeAndLockAll("用户结束 3P 临时解锁，恢复安全封锁");
+            _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_BtnClickRelock3P"));
             await RunPreFlightCheckAsync();
             return;
         }
@@ -560,13 +625,13 @@ public partial class MainWindow : Window
             if (_watchdog.State is AppProtectionState.CooldownLocked or AppProtectionState.CircuitBreakerTripped)
             {
                 BtnPrimaryAction.IsEnabled = false;
-                BtnPrimaryAction.Content = "正在重新检测网络...";
+                BtnPrimaryAction.Content = L.Get("Log_CheckingNetworkBtn");
                 var recoveryReport = await RunPreFlightCheckAsync(preserveCooldownState: true);
                 if (recoveryReport == null || !recoveryReport.CanLaunch || recoveryReport.ExitIpInfo == null)
                 {
                     MessageBox.Show(
-                        recoveryReport?.Summary ?? "当前网络仍存在高危风险，无法恢复 Claude 连接！请先修复代理后重试。",
-                        "无法恢复连接",
+                        recoveryReport?.Summary ?? L.Get("Dlg_RecoverFailMsg"),
+                        L.Get("Dlg_RecoverFailTitle"),
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
                     return;
@@ -576,7 +641,7 @@ public partial class MainWindow : Window
                     return;
 
                 var unblocked = _firewall.RemoveTrafficBlock(_processService.CollectObservedExecutablePaths(), keepForceProxyOnly: true);
-                AppendLog($"解除全量封锁：{unblocked.Message}");
+                AppendLog(L.Format("Log_UnblockFull", unblocked.Message));
                 _gatekeeper.OpenGate(recoveryReport.ProxyProbe.Host, recoveryReport.ProxyProbe.Port);
                 _configService.RecordSafeLaunchIp(_config, recoveryReport.ExitIpInfo);
                 UpdateIpBaselineSummaryUi();
@@ -588,7 +653,7 @@ public partial class MainWindow : Window
                         recoveryReport.ProxyProbe.Host,
                         recoveryReport.ProxyProbe.Port,
                         _config);
-                    AppendLog("✅ 网络已恢复安全，原有 Claude 进程已恢复受控通信！");
+                    AppendLog(L.Get("Log_ResumedProtected"));
                     return;
                 }
 
@@ -604,7 +669,7 @@ public partial class MainWindow : Window
                 }
                 else
                 {
-                    _watchdog.CleanExitClaudeAndLockAll("恢复启动 Claude 失败，回滚封锁");
+                    _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_RecoveryLaunchFail"));
                 }
                 return;
             }
@@ -619,16 +684,16 @@ public partial class MainWindow : Window
 
             if (string.IsNullOrWhiteSpace(_config.ClaudeExecutablePath) || !File.Exists(_config.ClaudeExecutablePath))
             {
-                MessageBox.Show("未能自动找到 Claude Desktop，请点击右下角【设置】手动选择路径。", "缺少程序路径", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(L.Get("Dlg_MissingPathMsg"), L.Get("Dlg_MissingPathTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             if (!ConfirmCrossCountryDriftIfNeeded(report))
                 return;
 
-            BtnPrimaryAction.Content = "安全通过 · 正在启动 Claude...";
+            BtnPrimaryAction.Content = L.Get("Log_LaunchingClaudeBtn");
             var fwUnlock = _firewall.RemoveTrafficBlock(_processService.CollectObservedExecutablePaths(), keepForceProxyOnly: true);
-            AppendLog($"放行准备：{fwUnlock.Message}");
+            AppendLog(L.Format("Log_AllowPrepare", fwUnlock.Message));
 
             _gatekeeper.OpenGate(report.ProxyProbe.Host, report.ProxyProbe.Port);
             _configService.RecordSafeLaunchIp(_config, report.ExitIpInfo);
@@ -643,8 +708,8 @@ public partial class MainWindow : Window
             }
             else
             {
-                _watchdog.CleanExitClaudeAndLockAll("启动 Claude 失败，自动回滚流量封锁");
-                MessageBox.Show(launchRes.Message, "启动失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_LaunchFailRollback"));
+                MessageBox.Show(launchRes.Message, L.Get("Dlg_LaunchFailTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         finally
@@ -656,7 +721,7 @@ public partial class MainWindow : Window
 
     private void BtnSecondaryKill_Click(object sender, RoutedEventArgs e)
     {
-        _watchdog.CleanExitClaudeAndLockAll("用户手动点击【封锁并立即退出 Claude】");
+        _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_SecondaryKill"));
     }
 
     private static bool ConfirmCrossCountryDriftIfNeeded(PreFlightReport report)
@@ -664,11 +729,11 @@ public partial class MainWindow : Window
         var driftItem = report.CheckItems.FirstOrDefault(x => x.Id == "ip_drift");
         if (driftItem != null &&
             driftItem.RiskLevel == RiskLevel.Warning &&
-            driftItem.StatusText.Contains("跨国", StringComparison.Ordinal))
+            driftItem.IsCrossCountryDrift)
         {
             var answer = MessageBox.Show(
-                $"{driftItem.StatusText}\n\n{driftItem.Detail}\n\n是否仍确认使用当前国家节点继续启动/恢复 Claude？",
-                "跨国 IP 漂移预警",
+                L.Format("Dlg_DriftMsg", driftItem.StatusText, driftItem.Detail),
+                L.Get("Dlg_DriftTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
             return answer == MessageBoxResult.Yes;
@@ -687,9 +752,9 @@ public partial class MainWindow : Window
 
     private void BtnSimulateTrip_Click(object sender, RoutedEventArgs e)
     {
-        AppendLog("⚡ 触发模拟测试：模拟运行期 VPN 掉线/IP 变动...");
+        AppendLog(L.Get("Log_SimulateStart"));
         _watchdog.TriggerCircuitBreaker(
-            "【模拟演练】检测到上游代理意外断开 / 出口 IP 回落境内",
+            L.Get("Log_SimulateReason"),
             new IpGeoInfo { Ip = "114.114.114.114", CountryCode = "CN", Country = "China" },
             isSimulation: true);
     }
@@ -706,7 +771,7 @@ public partial class MainWindow : Window
             if (IsClosingOrClosed || _isExitPromptOpen)
                 return;
 
-            ShowTrayBalloon("🚨 网络异常已毫秒级熔断", $"{args.Reason}。已切断流量并保留 Claude 进程。", WinForms.ToolTipIcon.Error);
+            ShowTrayBalloon(L.Get("Balloon_TrippedTitle"), L.Format("Balloon_TrippedText", args.Reason), WinForms.ToolTipIcon.Error);
 
             var dialog = new CircuitBreakerWindow(args, _config.CooldownDurationSeconds);
             if (IsLoaded && IsVisible && !IsClosingOrClosed && PresentationSource.FromVisual(this) != null)
@@ -729,7 +794,7 @@ public partial class MainWindow : Window
 
             if (dialogResult == true && dialog.SelectedAction == CircuitBreakerAction.KillClaudeProcesses)
             {
-                _watchdog.CleanExitClaudeAndLockAll("网络变动熔断：5 秒倒计时结束或用户确认立即退出 Claude");
+                _watchdog.CleanExitClaudeAndLockAll(L.Get("Log_TrippedKill"));
             }
             else
             {
@@ -756,7 +821,7 @@ public partial class MainWindow : Window
         LogoScaleTransform.ScaleY = 0.93;
         LogoProgressArc.Visibility = Visibility.Visible;
         UpdateLogoProgressArc(0.01);
-        MainStatusTitle.Text = "长按解锁 3P 模式... 0%";
+        MainStatusTitle.Text = L.Format("Logo_LongPressProgress", 0);
         Mouse.Capture(ClaudeLogoBorder);
 
         _longPressTimer?.Stop();
@@ -794,7 +859,7 @@ public partial class MainWindow : Window
 
         LogoRotateTransform.Angle = progress * 360.0;
         UpdateLogoProgressArc(progress);
-        MainStatusTitle.Text = $"长按解锁 3P 模式... {(int)(progress * 100)}%";
+        MainStatusTitle.Text = L.Format("Logo_LongPressProgress", (int)(progress * 100));
 
         if (progress >= 1.0)
         {
@@ -815,7 +880,7 @@ public partial class MainWindow : Window
         LogoScaleTransform.ScaleY = 1.0;
         LogoProgressArc.Visibility = Visibility.Collapsed;
 
-        _watchdog.EnterManualUnlockedMode("用户长按 Logo 1 秒临时解锁（允许 Claude 3P 模式自由启动）");
+        _watchdog.EnterManualUnlockedMode(L.Get("Logo_LongPressLog"));
     }
 
     private void CancelLongPressLogo()
@@ -917,7 +982,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            AppendLog("用户取消了管理员 UAC 提权。");
+            AppendLog(L.Get("Log_AdminUacCancelled"));
         }
     }
 
@@ -925,8 +990,8 @@ public partial class MainWindow : Window
     {
         using var ofd = new WinForms.OpenFileDialog
         {
-            Title = "选择 Claude Desktop 主程序 (claude.exe / claude-desktop-msstore.exe)",
-            Filter = "Claude 可执行文件 (*.exe)|*.exe|所有文件 (*.*)|*.*",
+            Title = L.Get("Dlg_BrowseClaudeTitle"),
+            Filter = L.Get("Dlg_BrowseClaudeFilter"),
             CheckFileExists = true
         };
 
@@ -934,7 +999,7 @@ public partial class MainWindow : Window
         {
             TxtClaudePath.Text = ofd.FileName;
             SaveUiConfigInputs();
-            AppendLog($"已更新 Claude Desktop 路径: {ofd.FileName}");
+            AppendLog(L.Format("Log_UpdatedClaudePath", ofd.FileName));
         }
     }
 
@@ -954,7 +1019,7 @@ public partial class MainWindow : Window
         AppendLog(res.Message);
         if (!res.Success)
         {
-            MessageBox.Show(res.Message, "开机启动设置失败", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(res.Message, L.Get("Dlg_AutoStartFailTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -964,11 +1029,26 @@ public partial class MainWindow : Window
         SaveUiConfigInputs();
     }
 
+    private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded) return;
+        if (CmbLanguage.SelectedItem is ComboBoxItem cbi && cbi.Tag is string langTag)
+        {
+            var normalized = L.NormalizeSetting(langTag);
+            if (!string.Equals(_config.Language, normalized, StringComparison.OrdinalIgnoreCase))
+            {
+                _config.Language = normalized;
+                _configService.Save(_config);
+            }
+            L.SetLanguage(normalized, notify: true);
+        }
+    }
+
     private async void BtnResetIpBaseline_Click(object sender, RoutedEventArgs e)
     {
         _configService.ClearIpBaseline(_config);
         UpdateIpBaselineSummaryUi();
-        AppendLog("已重置历史登录 IP 基线，下次安全启动将记录新基线。");
+        AppendLog(L.Get("Log_ResetBaseline"));
         if (_watchdog.State is AppProtectionState.LockedIdle or AppProtectionState.ReadyToLaunch)
         {
             await RunPreFlightCheckAsync();
@@ -1061,8 +1141,8 @@ public partial class MainWindow : Window
         {
             _hasShownTrayHint = true;
             ShowTrayBalloon(
-                "ClaudeSafe 已转入后台常驻守护",
-                "防直连封锁与进程看门狗仍在运行。双击托盘图标可重新打开窗口，右键可彻底退出。",
+                L.Get("Tray_HiddenTitle"),
+                L.Get("Tray_HiddenText"),
                 WinForms.ToolTipIcon.Info);
         }
     }
@@ -1094,12 +1174,11 @@ public partial class MainWindow : Window
             {
                 RestoreAndFocusWindow();
 
-                const string promptText =
-                    "Claude Desktop 正在运行，是否同步退出？\n\n• 点击【是】：同步关闭 Claude Desktop，并退出 ClaudeSafe（还原所有网络、防火墙与 Hosts 设置）。\n• 点击【否】：保留 Claude Desktop，仅退出 ClaudeSafe 并还原系统设置。\n• 点击【取消】：取消退出，继续保持后台安全守护。";
+                var promptText = L.Get("Dlg_ExitConfirmMsg");
                 bool canUseOwner = IsLoaded && IsVisible && !_isClosingOrClosed && PresentationSource.FromVisual(this) != null;
                 var answer = canUseOwner
-                    ? MessageBox.Show(this, promptText, "退出确认", MessageBoxButton.YesNoCancel, MessageBoxImage.Question)
-                    : MessageBox.Show(promptText, "退出确认", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    ? MessageBox.Show(this, promptText, L.Get("Dlg_ExitConfirmTitle"), MessageBoxButton.YesNoCancel, MessageBoxImage.Question)
+                    : MessageBox.Show(promptText, L.Get("Dlg_ExitConfirmTitle"), MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 if (answer == MessageBoxResult.Cancel || answer == MessageBoxResult.None)
                     return;
@@ -1147,7 +1226,7 @@ public partial class MainWindow : Window
         }
 
         _watchdog.ShutdownAndRestoreAllOnExit(
-            "ClaudeSafe 退出，还原所有系统网络、防火墙与 Hosts 设置",
+            L.Get("Log_ExitRestoreReason"),
             allowElevateIfNeeded: !isRestartingAsAdmin,
             killClaudeProcesses: !isRestartingAsAdmin && _killClaudeOnExit);
         _watchdog.Dispose();

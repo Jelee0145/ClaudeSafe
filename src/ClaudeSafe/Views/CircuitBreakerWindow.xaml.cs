@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Services;
 
 namespace ClaudeSafe.Views;
@@ -27,18 +28,16 @@ public partial class CircuitBreakerWindow : Window
         ReasonText.Text = args.Reason;
         ExpectedIpText.Text = args.ExpectedIp != null
             ? $"{args.ExpectedIp.Ip} ({args.ExpectedIp.CountryCode})"
-            : "暂无基线";
+            : L.Get("CB_NoBaseline");
 
         var currentIpDisplay = args.CurrentIp != null && !string.IsNullOrWhiteSpace(args.CurrentIp.Ip)
             ? $"{args.CurrentIp.Ip} ({args.CurrentIp.CountryCode})"
-            : "无出口";
-        CurrentStatusText.Text = $"{currentIpDisplay} · 切断 {args.SeveredConnections} 连接";
+            : L.Get("CB_NoExit");
+        CurrentStatusText.Text = L.Format("CB_CurrentStatusFormat", currentIpDisplay, args.SeveredConnections);
 
         int mins = Math.Max(1, cooldownDurationSeconds / 60);
-        BtnCooldownLock.Content = $"取消（熔断保护 {mins} 分钟）";
-        BehaviorDescText.Text =
-            $"• 点击【确定】（或倒计时结束）：立即强杀并退出 Claude Desktop。\n" +
-            $"• 点击【取消】：保持断网并进入 {mins} 分钟熔断保护，检测到网络调整好后自动恢复连接并发送系统通知。";
+        BtnCooldownLock.Content = L.Format("CB_BtnCooldown", mins);
+        BehaviorDescText.Text = L.Format("CB_Desc", mins);
 
         UpdateCountdownUi();
 
@@ -71,8 +70,8 @@ public partial class CircuitBreakerWindow : Window
 
     private void UpdateCountdownUi()
     {
-        CountdownSublineText.Text = $"已立即切断网络连接 · {_secondsRemaining} 秒后将自动退出 Claude";
-        BtnKillClaude.Content = $"确定（立即退出 · {_secondsRemaining}s）";
+        CountdownSublineText.Text = L.Format("CB_Subline", _secondsRemaining);
+        BtnKillClaude.Content = L.Format("CB_BtnKill", _secondsRemaining);
     }
 
     private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

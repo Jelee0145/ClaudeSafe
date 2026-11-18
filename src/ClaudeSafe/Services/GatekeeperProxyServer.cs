@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ClaudeSafe.Localization;
 
 namespace ClaudeSafe.Services;
 
@@ -73,7 +74,7 @@ public sealed class GatekeeperProxyServer : IDisposable
         _serverCts = new CancellationTokenSource();
         IsRunning = true;
         _acceptLoopTask = Task.Run(() => AcceptLoopAsync(_serverCts.Token));
-        OnTrafficLog?.Invoke($"守门代理已在 127.0.0.1:{ListeningPort} 启动（初始状态：Claude 阀门锁死，PAC 已就绪）");
+        OnTrafficLog?.Invoke(L.Format("Gate_Started", ListeningPort));
         OnStatsChanged?.Invoke();
     }
 
@@ -107,7 +108,7 @@ public sealed class GatekeeperProxyServer : IDisposable
             _isGateOpen = true;
         }
 
-        OnTrafficLog?.Invoke($"守门代理阀门已开启 → 上游通道 {_upstreamHost}:{_upstreamPort}");
+        OnTrafficLog?.Invoke(L.Format("Gate_Opened", _upstreamHost, _upstreamPort));
         OnStatsChanged?.Invoke();
     }
 
@@ -131,7 +132,7 @@ public sealed class GatekeeperProxyServer : IDisposable
             }
         }
 
-        OnTrafficLog?.Invoke($"[熔断封锁] {reason} — 已锁死 Claude 阀门并毫秒级切断 {severedCount} 条活跃连接");
+        OnTrafficLog?.Invoke(L.Format("Gate_Severed", reason, severedCount));
         OnStatsChanged?.Invoke();
         return severedCount;
     }
@@ -226,7 +227,7 @@ public sealed class GatekeeperProxyServer : IDisposable
             {
                 if (!ct.IsCancellationRequested)
                 {
-                    OnTrafficLog?.Invoke($"守门代理接收连接异常: {ex.Message}");
+                    OnTrafficLog?.Invoke(L.Format("Gate_AcceptError", ex.Message));
                 }
             }
         }
@@ -332,7 +333,7 @@ public sealed class GatekeeperProxyServer : IDisposable
             OnStatsChanged?.Invoke();
             if (isClaudeTarget && !string.IsNullOrWhiteSpace(targetLabel))
             {
-                OnTrafficLog?.Invoke($"[放行转发] {targetLabel} → {targetHost}:{targetPort}");
+                OnTrafficLog?.Invoke(L.Format("Gate_Forwarded", targetLabel, targetHost, targetPort));
             }
 
             var upstreamStream = upstream.GetStream();
@@ -431,8 +432,8 @@ public sealed class GatekeeperProxyServer : IDisposable
         {
             try { client.Close(); } catch { }
             try { client.Dispose(); } catch { }
-            var label = string.IsNullOrWhiteSpace(targetHint) ? "未知 Claude 出站请求" : targetHint;
-            OnTrafficLog?.Invoke($"[已拦截] 守门阀门已锁死，拒绝连接: {label}");
+            var label = string.IsNullOrWhiteSpace(targetHint) ? L.Get("Gate_UnknownTarget") : targetHint;
+            OnTrafficLog?.Invoke(L.Format("Gate_Blocked", label));
             OnStatsChanged?.Invoke();
         }
     }
@@ -547,7 +548,7 @@ public sealed class GatekeeperProxyServer : IDisposable
         if (!IsRunning)
             return;
 
-        LockGateAndSeverAll("守门代理服务停止");
+        LockGateAndSeverAll(L.Get("Gate_StopReason"));
         IsRunning = false;
 
         foreach (var kvp in _activeConnections)

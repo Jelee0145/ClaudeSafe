@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Models;
 using Microsoft.Win32;
 
@@ -347,7 +348,7 @@ public sealed class ProxyDetectorService
                     configuredPort,
                     true,
                     cfgLatency,
-                    $"配置端口 ({configuredHost}:{configuredPort})");
+                    L.Format("Proxy_ConfigPort", configuredHost, configuredPort));
             }
         }
 
@@ -364,7 +365,7 @@ public sealed class ProxyDetectorService
                     sysPort.Value,
                     true,
                     sysLatency,
-                    $"Windows 系统代理自动发现 ({sysHost}:{sysPort.Value})");
+                    L.Format("Proxy_SysProxyAuto", sysHost, sysPort.Value));
             }
         }
 
@@ -397,7 +398,7 @@ public sealed class ProxyDetectorService
                     hit.Port,
                     true,
                     hit.Latency,
-                    $"自动探测常见代理端口 (127.0.0.1:{hit.Port})");
+                    L.Format("Proxy_CommonPortAuto", hit.Port));
             }
         }
 
@@ -406,6 +407,6 @@ public sealed class ProxyDetectorService
             configuredPort,
             false,
             0,
-            "未检测到可用的本地代理端口");
+            L.Get("Proxy_NoneFound"));
     }
 }

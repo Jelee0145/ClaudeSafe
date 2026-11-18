@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Models;
 using Microsoft.Win32;
 
@@ -37,6 +38,9 @@ public static class SelfTestRunner
 
         // 5. 测试退出还原（系统代理还原、PAC 清理及 Hosts 区块无痕移除）
         results.Add(TestExitCleanupLeavesNoTrace());
+
+        // 6. 测试多语言字典完整性与切换
+        results.Add(TestLocalizationParity());
 
         Console.WriteLine("============================================================");
         Console.WriteLine("ClaudeSafe 自动化自检报告 (--self-test)");
@@ -544,6 +548,38 @@ public static class SelfTestRunner
         {
             try { if (File.Exists(tempBackup)) File.Delete(tempBackup); } catch { }
             try { if (File.Exists(tempHosts)) File.Delete(tempHosts); } catch { }
+        }
+    }
+
+    private static (string Name, bool Passed, string Detail) TestLocalizationParity()
+    {
+        var previous = L.SelectedSetting;
+        try
+        {
+            var (isValid, missingInEn, missingInZh) = L.ValidateDictionaries();
+            if (!isValid)
+            {
+                return ("多语言字典完整性与切换验证", false,
+                    $"字典键不匹配: MissingInEn=[{string.Join(", ", missingInEn)}], MissingInZh=[{string.Join(", ", missingInZh)}]");
+            }
+
+            L.SetLanguage(L.ZhCN, notify: false);
+            var zhTitle = L.Get("Settings_Title");
+            L.SetLanguage(L.EnUS, notify: false);
+            var enTitle = L.Get("Settings_Title");
+
+            if (zhTitle != "设置" || enTitle != "Settings")
+            {
+                return ("多语言字典完整性与切换验证", false,
+                    $"语言切换结果异常: zh={zhTitle}, en={enTitle}");
+            }
+
+            return ("多语言字典完整性与切换验证", true,
+                $"zh-CN 与 en-US 字典键完全一致，运行时切换校验通过");
+        }
+        finally
+        {
+            L.SetLanguage(previous, notify: false);
         }
     }
 }

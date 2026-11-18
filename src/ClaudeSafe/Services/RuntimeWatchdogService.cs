@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Models;
 
 namespace ClaudeSafe.Services;
@@ -134,7 +135,7 @@ public sealed class RuntimeWatchdogService : IDisposable
 
         _systemProxy.UpdateGatekeeperState(_gatekeeper.ListeningPort, isGateOpen: true);
         OnStateChanged?.Invoke(AppProtectionState.RunningProtected);
-        OnLog?.Invoke($"运行期守护已激活：绑定安全 IP {boundIp.Ip} ({boundIp.CountryCode})，每 3s 巡检代理 / 每 15s 校验出口 IP");
+        OnLog?.Invoke(L.Format("Wd_Activated", boundIp.Ip, boundIp.CountryCode));
     }
 
     public void ResumeProtectedSessionAfterCooldown(IpGeoInfo newBoundIp, string proxyHost, int proxyPort, AppConfig config)
@@ -156,7 +157,7 @@ public sealed class RuntimeWatchdogService : IDisposable
 
         OnStateChanged?.Invoke(AppProtectionState.CooldownLocked);
         OnCooldownTick?.Invoke(duration);
-        OnLog?.Invoke($"已进入 {duration / 60} 分 {duration % 60:D2} 秒熔断冷静期（保持断网；每 3 秒自动检测网络恢复情况）");
+        OnLog?.Invoke(L.Format("Wd_CooldownEntered", duration / 60, duration % 60));
     }
 
     public void EnterManualUnlockedMode(string reason)
@@ -173,7 +174,7 @@ public sealed class RuntimeWatchdogService : IDisposable
         var fwResult = _firewall.RemoveTrafficBlock(keepForceProxyOnly: false);
 
         OnStateChanged?.Invoke(AppProtectionState.ManualUnlocked);
-        OnLog?.Invoke($"🔓 [3P 临时解锁] {reason} — 已解除全部封锁与看门狗拦截（{fwResult.Message}）");
+        OnLog?.Invoke(L.Format("Wd_Unlocked3P", reason, fwResult.Message));
     }
 
     public void CleanExitClaudeAndLockAll(string reason)
@@ -196,7 +197,7 @@ public sealed class RuntimeWatchdogService : IDisposable
         }
 
         OnStateChanged?.Invoke(AppProtectionState.LockedIdle);
-        OnLog?.Invoke($"[安全清理] {reason}：切断 {severed} 条连接，强杀 {killed} 个主/子进程。系统封锁：{fwResult.Message}");
+        OnLog?.Invoke(L.Format("Wd_CleanExitLog", reason, severed, killed, fwResult.Message));
     }
 
     /// <summary>
@@ -238,7 +239,7 @@ public sealed class RuntimeWatchdogService : IDisposable
             _state = AppProtectionState.LockedIdle;
         }
 
-        OnLog?.Invoke($"[退出还原] {reason}：切断 {severed} 条连接，清理 {killed} 个进程；{fwRestore.Message}");
+        OnLog?.Invoke(L.Format("Wd_ExitRestoreLog", reason, severed, killed, fwRestore.Message));
     }
 
     public void TriggerCircuitBreaker(string reason, IpGeoInfo? currentIp, bool isSimulation = false)
@@ -266,7 +267,7 @@ public sealed class RuntimeWatchdogService : IDisposable
         var fwResult = _firewall.ApplyTrafficBlock(paths, cfg.EnableFirewallRule, cfg.EnableHostsBlock);
 
         OnStateChanged?.Invoke(AppProtectionState.CircuitBreakerTripped);
-        OnLog?.Invoke($"🚨 [紧急熔断] {reason}！已断开 {severed} 条连接并封锁全部流量（保留 Claude 进程）。{fwResult.Message}");
+        OnLog?.Invoke(L.Format("Wd_TrippedLog", reason, severed) + " " + fwResult.Message);
 
         OnCircuitBreakerTripped?.Invoke(new CircuitBreakerTrippedEventArgs
         {
@@ -331,7 +332,7 @@ public sealed class RuntimeWatchdogService : IDisposable
 
                     if (expired)
                     {
-                        CleanExitClaudeAndLockAll("熔断冷静期已结束且网络未恢复，自动安全退出 Claude");
+                        CleanExitClaudeAndLockAll(L.Get("Wd_CooldownExpiredReason"));
                         OnCooldownExpired?.Invoke();
                         continue;
                     }
@@ -342,8 +343,8 @@ public sealed class RuntimeWatchdogService : IDisposable
                     // 冷静期内如果原本有 Claude 运行且用户自己手动关掉了 Claude 窗口，自动回收到 LockedIdle
                     if (hadRunningClaude && _tickCounter % 2 == 0 && _processService.GetRunningClaudeProcessCount() == 0)
                     {
-                        CleanExitClaudeAndLockAll("冷静期内检测到用户已关闭 Claude Desktop");
-                        OnClaudeExitedCleanly?.Invoke("冷静期内 Claude 已关闭，已回收至常态安全封锁状态。");
+                        CleanExitClaudeAndLockAll(L.Get("Wd_UserClosedInCooldownReason"));
+                        OnClaudeExitedCleanly?.Invoke(L.Get("Wd_UserClosedInCooldownNotify"));
                         continue;
                     }
 
@@ -366,8 +367,8 @@ public sealed class RuntimeWatchdogService : IDisposable
                             int procCount = _processService.GetRunningClaudeProcessCount();
                             if (procCount == 0)
                             {
-                                CleanExitClaudeAndLockAll("检测到 Claude Desktop 已退出，自动清理残余进程并封锁全部流量");
-                                OnClaudeExitedCleanly?.Invoke("检测到 Claude Desktop 未运行，已自动封锁 Anthropic 出口并清理进程。");
+                                CleanExitClaudeAndLockAll(L.Get("Wd_ClaudeExitedReason"));
+                                OnClaudeExitedCleanly?.Invoke(L.Get("Wd_ClaudeExitedNotify"));
                                 continue;
                             }
                         }
@@ -379,13 +380,13 @@ public sealed class RuntimeWatchdogService : IDisposable
                         int unauthorizedCount = _processService.GetRunningClaudeProcessCount();
                         if (unauthorizedCount > 0)
                         {
-                            _gatekeeper.LockGateAndSeverAll("拦截未经安全体检的 Claude 直接启动");
+                            _gatekeeper.LockGateAndSeverAll(L.Get("Wd_BlockUnauthGateReason"));
                             var paths = _processService.CollectObservedExecutablePaths();
                             _firewall.ApplyTrafficBlock(paths, cfg.EnableFirewallRule, cfg.EnableHostsBlock);
                             int killed = _processService.KillAllClaudeProcesses();
 
-                            var msg = $"检测到未通过 ClaudeSafe 体检直接运行的 Claude 进程（{killed} 个），已强制拦截并封锁流量！请使用小助手安全启动。";
-                            OnLog?.Invoke($"🛡️ [防裸连拦截] {msg}");
+                            var msg = L.Format("Wd_BlockUnauthNotify", killed);
+                            OnLog?.Invoke($"🛡️ {msg}");
                             OnUnauthorizedLaunchBlocked?.Invoke(msg);
                             continue;
                         }
@@ -407,7 +408,7 @@ public sealed class RuntimeWatchdogService : IDisposable
                                 .ConfigureAwait(false);
                             if (!retryOk)
                             {
-                                TriggerCircuitBreaker($"本地代理端口 {proxyHost}:{proxyPort} 已断开（VPN/代理掉线）", null);
+                                TriggerCircuitBreaker(L.Format("Wd_ProxyPortLost", proxyHost, proxyPort), null);
                                 continue;
                             }
                         }
@@ -421,7 +422,7 @@ public sealed class RuntimeWatchdogService : IDisposable
                             var retryTun = _proxyDetector.DetectActiveTunAdapter();
                             if (!retryTun.Enabled && !retrySys.Enabled)
                             {
-                                TriggerCircuitBreaker("运行期检测到 TUN 模式与系统代理已全部关闭（防止直连泄漏）", null);
+                                TriggerCircuitBreaker(L.Get("Wd_TunAndSysProxyOff"), null);
                                 continue;
                             }
                         }
@@ -443,18 +444,18 @@ public sealed class RuntimeWatchdogService : IDisposable
 
                         if (currentIp == null || string.IsNullOrWhiteSpace(currentIp.Ip))
                         {
-                            TriggerCircuitBreaker("运行期无法探测到代理出口 IP（VPN 可能已断流或超时）", null);
+                            TriggerCircuitBreaker(L.Get("Wd_ExitIpLost"), null);
                         }
                         else if (NetworkCheckService.IsBlockedCountryCode(currentIp.CountryCode))
                         {
                             TriggerCircuitBreaker(
-                                $"Claude 出口落入受限地区：{currentIp.Ip} ({currentIp.CountryCode})",
+                                L.Format("Wd_ExitIpBlocked", currentIp.Ip, currentIp.CountryCode),
                                 currentIp);
                         }
                         else if (boundIp != null && !string.Equals(currentIp.Ip, boundIp.Ip, StringComparison.OrdinalIgnoreCase))
                         {
                             TriggerCircuitBreaker(
-                                $"出口 IP 发生漂移：{boundIp.Ip} ({boundIp.CountryCode}) → {currentIp.Ip} ({currentIp.CountryCode})",
+                                L.Format("Wd_ExitIpDrifted", boundIp.Ip, boundIp.CountryCode, currentIp.Ip, currentIp.CountryCode),
                                 currentIp);
                         }
                     }
@@ -466,7 +467,7 @@ public sealed class RuntimeWatchdogService : IDisposable
             }
             catch (Exception ex)
             {
-                OnLog?.Invoke($"看门狗巡检异常: {ex.Message}");
+                OnLog?.Invoke(L.Format("Wd_PollException", ex.Message));
             }
         }
     }
@@ -507,7 +508,7 @@ public sealed class RuntimeWatchdogService : IDisposable
                     report.ProxyProbe.Host,
                     report.ProxyProbe.Port,
                     cfg);
-                OnLog?.Invoke($"✅ [熔断自动恢复] 检测到安全网络已恢复 ({report.ExitIpInfo.Ip} · {report.ExitIpInfo.CountryCode})，已自动恢复 Claude 连接！");
+                OnLog?.Invoke(L.Format("Wd_AutoRecoveredResumed", report.ExitIpInfo.Ip, report.ExitIpInfo.CountryCode));
                 OnCooldownAutoRecovered?.Invoke(report, true);
             }
             else
@@ -521,7 +522,7 @@ public sealed class RuntimeWatchdogService : IDisposable
                 }
                 _systemProxy.UpdateGatekeeperState(_gatekeeper.ListeningPort, isGateOpen: false);
                 OnStateChanged?.Invoke(AppProtectionState.ReadyToLaunch);
-                OnLog?.Invoke($"✅ [熔断自动恢复] 检测到安全网络已恢复 ({report.ExitIpInfo.Ip} · {report.ExitIpInfo.CountryCode})，已解除熔断锁定！");
+                OnLog?.Invoke(L.Format("Wd_AutoRecoveredIdle", report.ExitIpInfo.Ip, report.ExitIpInfo.CountryCode));
                 OnCooldownAutoRecovered?.Invoke(report, false);
             }
         }

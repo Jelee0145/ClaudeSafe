@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Principal;
 using System.Text;
+using ClaudeSafe.Localization;
 
 namespace ClaudeSafe.Services;
 
@@ -73,7 +74,7 @@ public sealed class FirewallManagerService
             return new FirewallActionResult(
                 false,
                 false,
-                "当前为标准用户权限，已启用守门代理与进程级封锁（如需写入系统防火墙和 Hosts，请点击提权以管理员运行）。");
+                L.Get("Fw_StandardModeNote"));
         }
 
         var actions = new List<string>();
@@ -104,7 +105,7 @@ public sealed class FirewallManagerService
                     }
                     else
                     {
-                        errors.Add($"防火墙规则添加失败({Path.GetFileName(exe)}): {output}");
+                        errors.Add(L.Format("Fw_RuleAddFail", Path.GetFileName(exe), output));
                     }
                 }
 
@@ -116,28 +117,28 @@ public sealed class FirewallManagerService
 
                 if (ipCode == 0)
                 {
-                    actions.Add($"已添加 Anthropic IP 段防火墙阻断（{remoteIps.Count} 项）");
+                    actions.Add(L.Format("Fw_IpBlockAdded", remoteIps.Count));
                 }
                 else
                 {
-                    errors.Add($"Anthropic IP 防火墙规则添加失败: {ipOut}");
+                    errors.Add(L.Format("Fw_IpRuleFail", ipOut));
                 }
 
                 // 常驻强制仅走代理规则：即使未来放行运行 Claude，也只允许回环 127.0.0.1，永久禁止任何直连公网
                 int proxyOnlyAdded = ApplyForceProxyOnlyRuleInternal(validExes);
                 if (proxyOnlyAdded > 0)
                 {
-                    actions.Add($"已开启禁直连规则（{proxyOnlyAdded} 个进程仅允许走本地代理）");
+                    actions.Add(L.Format("Fw_ProxyOnlyAdded", proxyOnlyAdded));
                 }
 
                 if (added > 0)
                 {
-                    actions.Add($"已添加 {added} 条 Claude 进程出站拦截规则");
+                    actions.Add(L.Format("Fw_OutboundAdded", added));
                 }
             }
             catch (Exception ex)
             {
-                errors.Add($"防火墙操作异常: {ex.Message}");
+                errors.Add(L.Format("Fw_Exception", ex.Message));
             }
         }
 
@@ -147,11 +148,11 @@ public sealed class FirewallManagerService
             {
                 WriteHostsBlockSection();
                 RunHiddenCommand("ipconfig", "/flushdns");
-                actions.Add($"已将 {BlockedDomains.Length} 个 Claude/Anthropic 域名写入 Hosts 黑洞并刷新 DNS");
+                actions.Add(L.Format("Fw_HostsAdded", BlockedDomains.Length));
             }
             catch (Exception ex)
             {
-                errors.Add($"Hosts 写入异常: {ex.Message}");
+                errors.Add(L.Format("Fw_HostsException", ex.Message));
             }
         }
 
@@ -161,7 +162,7 @@ public sealed class FirewallManagerService
         }
 
         var msg = string.Join("；", actions.Concat(errors));
-        return new FirewallActionResult(errors.Count == 0, true, string.IsNullOrWhiteSpace(msg) ? "系统级封锁已生效" : msg);
+        return new FirewallActionResult(errors.Count == 0, true, string.IsNullOrWhiteSpace(msg) ? L.Get("Fw_DefaultApplied") : msg);
     }
 
     public FirewallActionResult RemoveTrafficBlock(IEnumerable<string>? claudeExePaths = null, bool keepForceProxyOnly = true)
@@ -172,11 +173,11 @@ public sealed class FirewallManagerService
             {
                 if (TryRunElevatedCleanAll())
                 {
-                    return new FirewallActionResult(true, false, "已提权清理全部防火墙与 Hosts 封锁规则");
+                    return new FirewallActionResult(true, false, L.Get("Fw_ElevatedCleaned"));
                 }
             }
 
-            return new FirewallActionResult(true, false, "标准权限模式（仅由守门代理与启动参数限制代理通道）");
+            return new FirewallActionResult(true, false, L.Get("Fw_StandardRelease"));
         }
 
         var notes = new List<string>();
@@ -184,7 +185,7 @@ public sealed class FirewallManagerService
         {
             RunHiddenCommand("netsh", $"advfirewall firewall delete rule name=\"{FirewallRuleName}\"");
             RunHiddenCommand("netsh", $"advfirewall firewall delete rule name=\"{FirewallIpRuleName}\"");
-            notes.Add("已解除全量出站封锁");
+            notes.Add(L.Get("Fw_UnblockedAll"));
 
             if (keepForceProxyOnly && claudeExePaths != null)
             {
@@ -195,18 +196,18 @@ public sealed class FirewallManagerService
                 int forced = ApplyForceProxyOnlyRuleInternal(validExes);
                 if (forced > 0)
                 {
-                    notes.Add($"保持 Claude 禁直连防火墙（{forced} 个程序仅允许连接 127.0.0.1 代理）");
+                    notes.Add(L.Format("Fw_KeepProxyOnly", forced));
                 }
             }
             else if (!keepForceProxyOnly)
             {
                 RunHiddenCommand("netsh", $"advfirewall firewall delete rule name=\"{FirewallForceProxyOnlyRuleName}\"");
-                notes.Add("已彻底移除 Claude 防火墙规则");
+                notes.Add(L.Get("Fw_RemovedAll"));
             }
         }
         catch (Exception ex)
         {
-            notes.Add($"更新防火墙规则异常: {ex.Message}");
+            notes.Add(L.Format("Fw_UpdateException", ex.Message));
         }
 
         try
@@ -214,12 +215,12 @@ public sealed class FirewallManagerService
             if (RemoveHostsBlockSection())
             {
                 RunHiddenCommand("ipconfig", "/flushdns");
-                notes.Add("已解除 Hosts 域名封锁并刷新 DNS");
+                notes.Add(L.Get("Fw_HostsRemoved"));
             }
         }
         catch (Exception ex)
         {
-            notes.Add($"清理 Hosts 异常: {ex.Message}");
+            notes.Add(L.Format("Fw_HostsCleanException", ex.Message));
         }
 
         return new FirewallActionResult(true, true, string.Join("；", notes));
@@ -268,15 +269,15 @@ public sealed class FirewallManagerService
 
         if (!HasResidualSystemBlocks())
         {
-            return new FirewallActionResult(true, false, "无残留防火墙或 Hosts 封锁规则");
+            return new FirewallActionResult(true, false, L.Get("Fw_NoResidual"));
         }
 
         if (allowElevateIfNeeded && TryRunElevatedCleanAll())
         {
-            return new FirewallActionResult(true, false, "已提权彻底清除残留防火墙与 Hosts 封锁（不留痕）");
+            return new FirewallActionResult(true, false, L.Get("Fw_ResidualElevatedCleaned"));
         }
 
-        return new FirewallActionResult(false, false, "存在需要管理员权限清理的防火墙或 Hosts 残留规则");
+        return new FirewallActionResult(false, false, L.Get("Fw_ResidualNeedsAdmin"));
     }
 
     public static bool TryRunElevatedCleanAll()

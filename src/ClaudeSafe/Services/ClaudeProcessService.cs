@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using ClaudeSafe.Localization;
 using Microsoft.Win32;
 
 namespace ClaudeSafe.Services;
@@ -257,7 +258,7 @@ public sealed class ClaudeProcessService
     {
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
         {
-            return (false, "未找到 Claude Desktop 可执行文件，请在右侧手动指定路径。");
+            return (false, L.Get("Proc_ExeNotFound"));
         }
 
         try
@@ -293,14 +294,14 @@ public sealed class ClaudeProcessService
             var proc = Process.Start(psi);
             if (proc == null)
             {
-                return (false, "启动 Claude Desktop 进程返回空句柄。");
+                return (false, L.Get("Proc_NullHandle"));
             }
 
-            return (true, $"已通过守门代理 ({proxyUrl}) 启动 Claude Desktop (PID: {proc.Id})");
+            return (true, L.Format("Proc_Launched", proxyUrl, proc.Id));
         }
         catch (Exception ex)
         {
-            return (false, $"启动 Claude Desktop 失败: {ex.Message}");
+            return (false, L.Format("Proc_LaunchFail", ex.Message));
         }
     }
 

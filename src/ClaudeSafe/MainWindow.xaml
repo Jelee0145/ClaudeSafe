@@ -64,12 +64,12 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Button Style="{StaticResource TitleBarIconButtonStyle}"
                                 Content="—"
-                                ToolTip="最小化"
+                                ToolTip="{DynamicResource Main_MinimizeTip}"
                                 Click="BtnMinimize_Click"/>
                         <Button Style="{StaticResource TitleBarIconButtonStyle}"
                                 Content="✕"
                                 Margin="2,0,0,0"
-                                ToolTip="隐藏到系统托盘后台守护"
+                                ToolTip="{DynamicResource Main_HideToTrayTip}"
                                 Click="BtnHideToTray_Click"/>
                     </StackPanel>
                 </Grid>
@@ -90,7 +90,7 @@
                             Margin="0,0,0,10"
                             Cursor="Hand"
                             RenderTransformOrigin="0.5,0.5"
-                            ToolTip="未启动时：长按 1 秒临时解锁（用于启动 Claude 3P 模式）"
+                            ToolTip="{DynamicResource Main_LogoTip}"
                             MouseLeftButtonDown="ClaudeLogoBorder_MouseLeftButtonDown"
                             MouseLeftButtonUp="ClaudeLogoBorder_MouseLeftButtonUp"
                             LostMouseCapture="ClaudeLogoBorder_LostMouseCapture">
@@ -120,7 +120,7 @@
                     </Border>
 
                     <TextBlock x:Name="MainStatusTitle"
-                               Text="已开启流量封锁 · 待安全启动"
+                               Text="{DynamicResource State_LockedIdle}"
                                FontSize="17"
                                FontWeight="Bold"
                                Foreground="#141413"
@@ -134,7 +134,7 @@
                                 CornerRadius="10"
                                 Padding="10,3">
                             <TextBlock x:Name="IpPillText"
-                                       Text="🌐 出口 IP：点击下方按钮开始检测"
+                                       Text="{DynamicResource Main_IpPillDefault}"
                                        FontSize="11.5"
                                        Foreground="#5E5C56"/>
                         </Border>
@@ -165,7 +165,7 @@
                         Padding="10">
                     <Grid>
                         <TextBlock x:Name="EmptyCheckHint"
-                                   Text="点击下方按钮后，将在此显示代理通道、出口合规与防直连状态。"
+                                   Text="{DynamicResource Main_EmptyCheckHint}"
                                    FontSize="12"
                                    Foreground="#8C8980"
                                    TextWrapping="Wrap"
@@ -287,7 +287,7 @@
                                         Padding="10,8"
                                         VerticalAlignment="Center">
                                     <TextBlock x:Name="AllSafeSummaryText"
-                                               Text="全部 6 项检测均通过，悬停上方胶囊可查看详情。"
+                                               Text="{DynamicResource Main_AllSafeSummaryDefault}"
                                                FontSize="11.5"
                                                Foreground="#5E5C56"
                                                TextWrapping="Wrap"
@@ -330,7 +330,7 @@
                                                                 </Style>
                                                             </TextBlock.Style>
                                                             <Run Text="{Binding DisplayShortTitle, Mode=OneWay}"/>
-                                                            <Run Text="："/>
+                                                            <Run Text=": "/>
                                                             <Run Text="{Binding StatusText, Mode=OneWay}"/>
                                                         </TextBlock>
                                                         <TextBlock Text="{Binding Recommendation, Mode=OneWay}"
@@ -355,7 +355,7 @@
                             Style="{StaticResource PrimaryClaudeButtonStyle}"
                             Height="46"
                             Click="BtnPrimaryAction_Click"
-                            Content="检测网络并安全启动"/>
+                            Content="{DynamicResource State_BtnCheckAndLaunch}"/>
 
                     <Button x:Name="BtnSecondaryKill"
                             Style="{StaticResource DangerClaudeButtonStyle}"
@@ -364,11 +364,11 @@
                             Margin="0,6,0,0"
                             Visibility="Collapsed"
                             Click="BtnSecondaryKill_Click"
-                            Content="封锁并立即退出 Claude"/>
+                            Content="{DynamicResource Main_BtnSecondaryKill}"/>
 
                     <DockPanel Margin="2,10,0,0">
                         <TextBlock x:Name="FooterHintText"
-                                   Text="🛡️ 后台守护运行中 · 关窗不退出"
+                                   Text="{DynamicResource State_FooterDaemon}"
                                    FontSize="11"
                                    Foreground="#8C8980"
                                    VerticalAlignment="Center"/>
@@ -378,7 +378,7 @@
                                 Padding="11,5"
                                 FontSize="11.5"
                                 Click="BtnOpenSettings_Click"
-                                Content="⚙ 设置"/>
+                                Content="{DynamicResource Main_BtnSettings}"/>
                     </DockPanel>
                 </StackPanel>
             </Grid>
@@ -401,8 +401,8 @@
                             Padding="10,4"
                             FontSize="11.5"
                             Click="BtnCloseSettings_Click"
-                            Content="← 返回"/>
-                    <TextBlock Text="设置"
+                            Content="{DynamicResource Settings_Back}"/>
+                    <TextBlock Text="{DynamicResource Settings_Title}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#141413"
@@ -412,7 +412,7 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Content="✕"
-                            ToolTip="隐藏到系统托盘后台守护"
+                            ToolTip="{DynamicResource Main_HideToTrayTip}"
                             Click="BtnHideToTray_Click"/>
                 </Grid>
 
@@ -435,7 +435,7 @@
                             Padding="12,10"
                             Margin="0,0,0,8">
                         <StackPanel>
-                            <TextBlock Text="安全与守护策略" FontSize="11.5" FontWeight="SemiBold" Foreground="#141413" Margin="0,0,0,7"/>
+                            <TextBlock Text="{DynamicResource Settings_CardSecurity}" FontSize="11.5" FontWeight="SemiBold" Foreground="#141413" Margin="0,0,0,7"/>
 
                             <DockPanel Margin="0,0,0,6">
                                 <CheckBox x:Name="ChkAutoStart"
@@ -443,7 +443,7 @@
                                           FontSize="11.5"
                                           Checked="ChkAutoStart_Changed"
                                           Unchecked="ChkAutoStart_Changed"
-                                          Content="开机自启动（静默驻留托盘防裸连）"/>
+                                          Content="{DynamicResource Settings_ChkAutoStart}"/>
                             </DockPanel>
 
                             <DockPanel Margin="0,0,0,7">
@@ -453,27 +453,41 @@
                                           IsChecked="True"
                                           Checked="ProtectionOption_Changed"
                                           Unchecked="ProtectionOption_Changed"
-                                          Content="防误触强杀（拦截直接打开的 Claude）"/>
+                                          Content="{DynamicResource Settings_ChkBlockUnauthorized}"/>
                             </DockPanel>
 
                             <DockPanel Margin="0,0,0,6">
-                                <TextBlock Text="断流熔断冷静期" FontSize="11.5" Foreground="#3D3C38" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Settings_CooldownLabel}" FontSize="11.5" Foreground="#3D3C38" VerticalAlignment="Center"/>
                                 <ComboBox x:Name="CmbCooldownMinutes"
                                           Width="96"
                                           Height="25"
                                           FontSize="11"
                                           HorizontalAlignment="Right"
                                           SelectionChanged="CmbCooldownMinutes_SelectionChanged">
-                                    <ComboBoxItem Tag="60" Content="1 分钟"/>
-                                    <ComboBoxItem Tag="180" Content="3 分钟"/>
-                                    <ComboBoxItem Tag="300" Content="5 分钟" IsSelected="True"/>
-                                    <ComboBoxItem Tag="600" Content="10 分钟"/>
+                                    <ComboBoxItem Tag="60" Content="{DynamicResource Settings_Cooldown1m}"/>
+                                    <ComboBoxItem Tag="180" Content="{DynamicResource Settings_Cooldown3m}"/>
+                                    <ComboBoxItem Tag="300" Content="{DynamicResource Settings_Cooldown5m}" IsSelected="True"/>
+                                    <ComboBoxItem Tag="600" Content="{DynamicResource Settings_Cooldown10m}"/>
+                                </ComboBox>
+                            </DockPanel>
+
+                            <DockPanel Margin="0,0,0,6">
+                                <TextBlock Text="{DynamicResource Settings_LanguageLabel}" FontSize="11.5" Foreground="#3D3C38" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="CmbLanguage"
+                                          Width="112"
+                                          Height="25"
+                                          FontSize="11"
+                                          HorizontalAlignment="Right"
+                                          SelectionChanged="CmbLanguage_SelectionChanged">
+                                    <ComboBoxItem Tag="auto" Content="{DynamicResource Settings_LangAuto}"/>
+                                    <ComboBoxItem Tag="zh-CN" Content="{DynamicResource Settings_LangZhCN}"/>
+                                    <ComboBoxItem Tag="en-US" Content="{DynamicResource Settings_LangEnUS}"/>
                                 </ComboBox>
                             </DockPanel>
 
                             <DockPanel>
                                 <TextBlock x:Name="TxtIpBaselineSummary"
-                                           Text="IP 基线：暂无记录"
+                                           Text="{DynamicResource Settings_IpBaselineEmpty}"
                                            FontSize="11"
                                            Foreground="#6B6962"
                                            VerticalAlignment="Center"
@@ -484,7 +498,7 @@
                                         Padding="8,2"
                                         FontSize="10.5"
                                         Click="BtnResetIpBaseline_Click"
-                                        Content="重置基线"/>
+                                        Content="{DynamicResource Settings_BtnResetBaseline}"/>
                             </DockPanel>
                         </StackPanel>
                     </Border>
@@ -499,14 +513,14 @@
                             Margin="0,0,0,8">
                         <StackPanel>
                             <DockPanel Margin="0,0,0,7">
-                                <TextBlock Text="系统防护与网络" FontSize="11.5" FontWeight="SemiBold" Foreground="#141413" VerticalAlignment="Center"/>
+                                <TextBlock Text="{DynamicResource Settings_CardNetwork}" FontSize="11.5" FontWeight="SemiBold" Foreground="#141413" VerticalAlignment="Center"/>
                                 <Button x:Name="BtnRestartAdmin"
                                         Style="{StaticResource SecondaryLightButtonStyle}"
                                         HorizontalAlignment="Right"
                                         Padding="8,2"
                                         FontSize="10.5"
                                         Click="BtnRestartAdmin_Click"
-                                        Content="🛡️ 以管理员运行"/>
+                                        Content="{DynamicResource Settings_BtnRestartAdmin}"/>
                             </DockPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -517,14 +531,14 @@
                                           Margin="0,0,14,0"
                                           Checked="ProtectionOption_Changed"
                                           Unchecked="ProtectionOption_Changed"
-                                          Content="防火墙禁止直连"/>
+                                          Content="{DynamicResource Settings_ChkFirewall}"/>
                                 <CheckBox x:Name="ChkHosts"
                                           Style="{StaticResource LightCheckBoxStyle}"
                                           FontSize="11.5"
                                           IsChecked="True"
                                           Checked="ProtectionOption_Changed"
                                           Unchecked="ProtectionOption_Changed"
-                                          Content="Hosts 域名黑洞"/>
+                                          Content="{DynamicResource Settings_ChkHosts}"/>
                             </StackPanel>
 
                             <Grid Margin="0,0,0,7">
@@ -535,9 +549,9 @@
                                     <ColumnDefinition Width="6"/>
                                     <ColumnDefinition Width="68"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="TxtProxyHost" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="0" ToolTip="上游代理主机"/>
-                                <TextBox x:Name="TxtProxyPort" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="2" ToolTip="上游代理端口"/>
-                                <TextBox x:Name="TxtGatekeeperPort" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="4" ToolTip="守门代理端口"/>
+                                <TextBox x:Name="TxtProxyHost" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="0" ToolTip="{DynamicResource Settings_TipProxyHost}"/>
+                                <TextBox x:Name="TxtProxyPort" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="2" ToolTip="{DynamicResource Settings_TipProxyPort}"/>
+                                <TextBox x:Name="TxtGatekeeperPort" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="4" ToolTip="{DynamicResource Settings_TipGatekeeperPort}"/>
                             </Grid>
 
                             <Grid>
@@ -546,14 +560,14 @@
                                     <ColumnDefinition Width="6"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox x:Name="TxtClaudePath" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="0" ToolTip="Claude Desktop 路径"/>
+                                <TextBox x:Name="TxtClaudePath" Style="{StaticResource LightTextBoxStyle}" Height="27" Grid.Column="0" ToolTip="{DynamicResource Settings_TipClaudePath}"/>
                                 <Button Grid.Column="2"
                                         Style="{StaticResource SecondaryLightButtonStyle}"
                                         Height="27"
                                         Padding="10,2"
                                         FontSize="11"
                                         Click="BtnBrowseClaude_Click"
-                                        Content="浏览"/>
+                                        Content="{DynamicResource Settings_BtnBrowse}"/>
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -573,25 +587,25 @@
                                 Padding="4,8"
                                 FontSize="11"
                                 Click="BtnOnlyCheck_Click"
-                                Content="🔍 仅检测网络"/>
+                                Content="{DynamicResource Settings_BtnOnlyCheck}"/>
                         <Button Grid.Column="2"
                                 Style="{StaticResource SecondaryLightButtonStyle}"
                                 Padding="4,8"
                                 FontSize="11"
                                 Click="BtnSimulateTrip_Click"
-                                Content="⚡ 模拟断流熔断"/>
+                                Content="{DynamicResource Settings_BtnSimulateTrip}"/>
                         <Button Grid.Column="4"
                                 Style="{StaticResource SecondaryLightButtonStyle}"
                                 Padding="4,8"
                                 FontSize="11"
                                 Click="BtnOpenLogOverlay_Click"
-                                Content="📋 运行日志"/>
+                                Content="{DynamicResource Settings_BtnAuditLog}"/>
                     </Grid>
 
                     <!-- 底部守护统计与彻底退出 -->
                     <StackPanel Grid.Row="4">
                         <TextBlock x:Name="GatekeeperStatsText"
-                                   Text="守门端口 127.0.0.1:17890 [已锁死] · 已拦截 0 次"
+                                   Text=""
                                    FontSize="10.5"
                                    Foreground="#8C8980"
                                    HorizontalAlignment="Center"
@@ -600,7 +614,7 @@
                                 Height="38"
                                 FontSize="13"
                                 Click="BtnExitCompletely_Click"
-                                Content="彻底退出后台守护"/>
+                                Content="{DynamicResource Settings_BtnExitCompletely}"/>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -623,8 +637,8 @@
                             Padding="10,4"
                             FontSize="11.5"
                             Click="BtnCloseLogOverlay_Click"
-                            Content="← 返回设置"/>
-                    <TextBlock Text="运行审计日志"
+                            Content="{DynamicResource Log_BackToSettings}"/>
+                    <TextBlock Text="{DynamicResource Log_Title}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#141413"
@@ -661,12 +675,12 @@
                             Style="{StaticResource SecondaryLightButtonStyle}"
                             Height="34"
                             Click="BtnCopyLog_Click"
-                            Content="复制全部日志"/>
+                            Content="{DynamicResource Log_BtnCopy}"/>
                     <Button Grid.Column="2"
                             Style="{StaticResource SecondaryLightButtonStyle}"
                             Height="34"
                             Click="BtnClearLog_Click"
-                            Content="清空日志"/>
+                            Content="{DynamicResource Log_BtnClear}"/>
                 </Grid>
             </Grid>
         </Grid>

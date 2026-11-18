@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Services;
 
 namespace ClaudeSafe;
@@ -25,6 +26,16 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        try
+        {
+            var initialCfg = new ConfigService().Load();
+            L.SetLanguage(initialCfg.Language, notify: false);
+        }
+        catch
+        {
+            L.SetLanguage(L.Auto, notify: false);
+        }
+
         DispatcherUnhandledException += (_, args) =>
         {
             if (_mainWindow is { IsClosingOrClosed: true })
@@ -35,8 +46,8 @@ public partial class App : Application
             }
 
             MessageBox.Show(
-                $"界面运行发生未捕获异常（已拦截防止闪退）：\n{args.Exception.Message}",
-                "ClaudeSafe 异常保护",
+                L.Format("App_ExceptionMessage", args.Exception.Message),
+                L.Get("App_ExceptionTitle"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             args.Handled = true;
@@ -102,7 +113,7 @@ public partial class App : Application
             catch
             {
                 MessageBox.Show(
-                    "ClaudeSafe 已在系统托盘后台守护中。",
+                    L.Get("App_AlreadyRunning"),
                     "ClaudeSafe",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

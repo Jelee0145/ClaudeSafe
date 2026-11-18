@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using ClaudeSafe.Localization;
 using Microsoft.Win32;
 
 namespace ClaudeSafe.Services;
@@ -57,7 +58,7 @@ public sealed class SystemProxyService
             }
             catch (Exception ex)
             {
-                return (false, $"系统代理接管失败: {ex.Message}");
+                return (false, L.Format("SysProxy_TakeoverFail", ex.Message));
             }
         }
     }
@@ -74,7 +75,7 @@ public sealed class SystemProxyService
             }
             catch (Exception ex)
             {
-                return (false, $"刷新系统代理/PAC 状态失败: {ex.Message}");
+                return (false, L.Format("SysProxy_RefreshFail", ex.Message));
             }
         }
     }
@@ -88,7 +89,7 @@ public sealed class SystemProxyService
                 var backup = _backup ?? TryLoadBackupFile();
                 using var key = Registry.CurrentUser.OpenSubKey(InternetSettingsSubKey, writable: true);
                 if (key == null)
-                    return (false, "无法打开当前用户 Internet Settings 注册表键");
+                    return (false, L.Get("SysProxy_RegOpenFail"));
 
                 if (backup != null)
                 {
@@ -112,11 +113,11 @@ public sealed class SystemProxyService
                 NotifyWinInetChanged(synchronous: true);
                 TryDeleteBackupFile();
                 _backup = null;
-                return (true, "已恢复退出前的 Windows 系统代理设置");
+                return (true, L.Get("SysProxy_Restored"));
             }
             catch (Exception ex)
             {
-                return (false, $"恢复系统代理设置异常: {ex.Message}");
+                return (false, L.Format("SysProxy_RestoreError", ex.Message));
             }
         }
     }
@@ -158,7 +159,7 @@ public sealed class SystemProxyService
     {
         using var key = Registry.CurrentUser.OpenSubKey(InternetSettingsSubKey, writable: true);
         if (key == null)
-            return (false, "无法写入 HKCU Internet Settings 注册表键");
+            return (false, L.Get("SysProxy_RegWriteFail"));
 
         var stateTag = isGateOpen ? "open" : "locked";
         var ts = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -168,7 +169,7 @@ public sealed class SystemProxyService
         key.SetValue("AutoConfigURL", pacUrl, RegistryValueKind.String);
 
         NotifyWinInetChanged();
-        return (true, $"已刷新系统动态 PAC 策略（{(isGateOpen ? "允许通过安全代理访问 Claude" : "拦截浏览器及客户端 Claude 访问，其他网站直连/按原样访问")}）");
+        return (true, L.Format("SysProxy_PacApplied", isGateOpen ? L.Get("SysProxy_PacOpen") : L.Get("SysProxy_PacLocked")));
     }
 
     private static void RestoreOrDeleteValue(RegistryKey key, string name, string? value, int gatekeeperPort)

@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Models;
 
 namespace ClaudeSafe.Services;
@@ -84,16 +85,16 @@ public sealed class NetworkCheckService
         if (hasDanger)
         {
             var firstDanger = items.First(x => x.RiskLevel == RiskLevel.Danger);
-            summary = $"发现高危阻断项：{firstDanger.Title} — {firstDanger.StatusText}";
+            summary = L.Format("Chk_SummaryDanger", firstDanger.Title, firstDanger.StatusText);
         }
         else if (hasWarnings)
         {
             var warnCount = items.Count(x => x.RiskLevel == RiskLevel.Warning);
-            summary = $"未发现高危阻断，存在 {warnCount} 项风控提醒，请确认后启动";
+            summary = L.Format("Chk_SummaryWarning", warnCount);
         }
         else
         {
-            summary = "全部 6 项检测均为安全，可放心启动 Claude Desktop";
+            summary = L.Get("Chk_SummarySafe");
         }
 
         return new PreFlightReport
@@ -146,14 +147,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "proxy_channel",
-                Title = "1. 本地代理通道与模式检测",
-                ShortTitle = "代理模式",
-                Category = "代理连通",
+                Title = L.Get("Chk1_Title"),
+                ShortTitle = L.Get("Chk1_ShortTitle"),
+                Category = L.Get("Chk1_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = $"端口 {proxyProbe.Host}:{proxyProbe.Port} 不可达",
-                ShortStatus = "未连接",
-                Detail = "未能连接到本地代理软件（如 FlClash / Clash / v2rayN）。严禁在无代理时直连启动 Claude。",
-                Recommendation = "请先启动代理客户端并确认混合/HTTP 代理端口（常见为 7890 / 7897 / 10809），然后点击重新检测。"
+                StatusText = L.Format("Chk1_Unreachable_Status", proxyProbe.Host, proxyProbe.Port),
+                ShortStatus = L.Get("Chk1_Unreachable_Short"),
+                Detail = L.Get("Chk1_Unreachable_Detail"),
+                Recommendation = L.Get("Chk1_Unreachable_Rec")
             };
         }
 
@@ -162,14 +163,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "proxy_channel",
-                Title = "1. 本地代理通道与模式检测",
-                ShortTitle = "代理模式",
-                Category = "代理连通",
+                Title = L.Get("Chk1_Title"),
+                ShortTitle = L.Get("Chk1_ShortTitle"),
+                Category = L.Get("Chk1_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = "高危阻断：TUN 模式与系统代理均未开启",
-                ShortStatus = "未开TUN/系代",
-                Detail = $"虽然本地代理端口 ({proxyProbe.Host}:{proxyProbe.Port}) 在监听，但当前系统处于直连状态（未开 TUN 虚拟网卡，也未开启系统代理），直接放行会导致网页端或子进程裸连暴露真实 IP！",
-                Recommendation = "请在代理软件中开启【TUN 模式】（强烈推荐）或开启【系统代理】后，再点击重新检测。"
+                StatusText = L.Get("Chk1_NoTunNoSys_Status"),
+                ShortStatus = L.Get("Chk1_NoTunNoSys_Short"),
+                Detail = L.Format("Chk1_NoTunNoSys_Detail", proxyProbe.Host, proxyProbe.Port),
+                Recommendation = L.Get("Chk1_NoTunNoSys_Rec")
             };
         }
 
@@ -178,44 +179,46 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "proxy_channel",
-                Title = "1. 本地代理通道与模式检测",
-                ShortTitle = "代理模式",
-                Category = "代理连通",
+                Title = L.Get("Chk1_Title"),
+                ShortTitle = L.Get("Chk1_ShortTitle"),
+                Category = L.Get("Chk1_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = $"仅开启系统代理 · 未开 TUN ({proxyProbe.LatencyMs} ms)",
-                ShortStatus = "仅系统代理",
-                Detail = $"代理通道：{proxyProbe.SourceDescription}。当前仅开启了 Windows 系统代理，未检测到 TUN 虚拟网卡。",
-                Recommendation = "建议在代理软件中开启【TUN 模式】后再启动，以更彻底地接管所有子进程与浏览器流量。"
+                StatusText = L.Format("Chk1_SysOnly_Status", proxyProbe.LatencyMs),
+                ShortStatus = L.Get("Chk1_SysOnly_Short"),
+                Detail = L.Format("Chk1_SysOnly_Detail", proxyProbe.SourceDescription),
+                Recommendation = L.Get("Chk1_SysOnly_Rec")
             };
         }
+
+        var sysProxyLabel = proxyProbe.SystemProxyEnabled ? L.Get("Chk1_Enabled") : L.Get("Chk1_DisabledTun");
 
         if (proxyProbe.LatencyMs > 500)
         {
             return new CheckItemResult
             {
                 Id = "proxy_channel",
-                Title = "1. 本地代理通道与模式检测",
-                ShortTitle = "代理模式",
-                Category = "代理连通",
+                Title = L.Get("Chk1_Title"),
+                ShortTitle = L.Get("Chk1_ShortTitle"),
+                Category = L.Get("Chk1_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = $"TUN 已开启但延迟偏高 ({proxyProbe.LatencyMs} ms)",
-                ShortStatus = "TUN 偏慢",
-                Detail = $"上游代理：{proxyProbe.SourceDescription}，TUN 网卡：{proxyProbe.TunAdapterName}，系统代理：{(proxyProbe.SystemProxyEnabled ? "已开启" : "未开启（已由 TUN 接管）")}。",
-                Recommendation = "本地回环响应延迟偏高，请检查代理软件是否卡顿。"
+                StatusText = L.Format("Chk1_Slow_Status", proxyProbe.LatencyMs),
+                ShortStatus = L.Get("Chk1_Slow_Short"),
+                Detail = L.Format("Chk1_Slow_Detail", proxyProbe.SourceDescription, proxyProbe.TunAdapterName, sysProxyLabel),
+                Recommendation = L.Get("Chk1_Slow_Rec")
             };
         }
 
         return new CheckItemResult
         {
             Id = "proxy_channel",
-            Title = "1. 本地代理通道与模式检测",
-            ShortTitle = "代理模式",
-            Category = "代理连通",
+            Title = L.Get("Chk1_Title"),
+            ShortTitle = L.Get("Chk1_ShortTitle"),
+            Category = L.Get("Chk1_Category"),
             RiskLevel = RiskLevel.Safe,
-            StatusText = $"TUN 模式已开启 ({proxyProbe.TunAdapterName} · {proxyProbe.LatencyMs} ms)",
-            ShortStatus = $"TUN · {proxyProbe.LatencyMs}ms",
-            Detail = $"上游代理：{proxyProbe.SourceDescription}，TUN 网卡：{proxyProbe.TunAdapterName}，系统代理：{(proxyProbe.SystemProxyEnabled ? "已开启" : "未开启（已由 TUN 接管）")}。",
-            Recommendation = "已开启 TUN 模式配合守门代理，全局防泄漏保护最佳。"
+            StatusText = L.Format("Chk1_Safe_Status", proxyProbe.TunAdapterName, proxyProbe.LatencyMs),
+            ShortStatus = L.Format("Chk1_Safe_Short", proxyProbe.LatencyMs),
+            Detail = L.Format("Chk1_Safe_Detail", proxyProbe.SourceDescription, proxyProbe.TunAdapterName, sysProxyLabel),
+            Recommendation = L.Get("Chk1_Safe_Rec")
         };
     }
 
@@ -226,14 +229,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "exit_region",
-                Title = "2. 出口 IP 与地区合规检测",
-                ShortTitle = "出口地区",
-                Category = "地区合规",
+                Title = L.Get("Chk2_Title"),
+                ShortTitle = L.Get("Chk2_ShortTitle"),
+                Category = L.Get("Chk2_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = "跳过（上游代理不可用）",
-                ShortStatus = "未探测",
-                Detail = "本地代理端口未连通，无法探测安全出口 IP。",
-                Recommendation = "请先恢复本地代理服务。"
+                StatusText = L.Get("Chk2_Skip_Status"),
+                ShortStatus = L.Get("Chk2_Skip_Short"),
+                Detail = L.Get("Chk2_Skip_Detail"),
+                Recommendation = L.Get("Chk2_Skip_Rec")
             };
         }
 
@@ -242,14 +245,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "exit_region",
-                Title = "2. 出口 IP 与地区合规检测",
-                ShortTitle = "出口地区",
-                Category = "地区合规",
+                Title = L.Get("Chk2_Title"),
+                ShortTitle = L.Get("Chk2_ShortTitle"),
+                Category = L.Get("Chk2_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = "无法获取代理出口 IP",
-                ShortStatus = "探测失败",
-                Detail = "通过本地代理请求多路 GeoIP 检测源均超时或失败，当前节点可能已断网或无效。",
-                Recommendation = "请在代理软件中切换可用节点，测试外网连通后重试。"
+                StatusText = L.Get("Chk2_Fail_Status"),
+                ShortStatus = L.Get("Chk2_Fail_Short"),
+                Detail = L.Get("Chk2_Fail_Detail"),
+                Recommendation = L.Get("Chk2_Fail_Rec")
             };
         }
 
@@ -258,28 +261,28 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "exit_region",
-                Title = "2. 出口 IP 与地区合规检测",
-                ShortTitle = "出口地区",
-                Category = "地区合规",
+                Title = L.Get("Chk2_Title"),
+                ShortTitle = L.Get("Chk2_ShortTitle"),
+                Category = L.Get("Chk2_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = $"高危禁区：{exitIp.CountryCode} ({exitIp.Ip})",
-                ShortStatus = $"{exitIp.CountryCode} · 禁区",
-                Detail = $"当前代理出口位于 {exitIp.DisplayLocation}，属于 Anthropic 明确封禁/不支持地区，启动即触发封号或拒绝服务！",
-                Recommendation = "请在代理软件中切换至美国(US)、日本(JP)、新加坡(SG)、英国(GB)或台湾(TW)等支持地区节点。"
+                StatusText = L.Format("Chk2_Blocked_Status", exitIp.CountryCode, exitIp.Ip),
+                ShortStatus = L.Format("Chk2_Blocked_Short", exitIp.CountryCode),
+                Detail = L.Format("Chk2_Blocked_Detail", exitIp.DisplayLocation),
+                Recommendation = L.Get("Chk2_Blocked_Rec")
             };
         }
 
         return new CheckItemResult
         {
             Id = "exit_region",
-            Title = "2. 出口 IP 与地区合规检测",
-            ShortTitle = "出口地区",
-            Category = "地区合规",
+            Title = L.Get("Chk2_Title"),
+            ShortTitle = L.Get("Chk2_ShortTitle"),
+            Category = L.Get("Chk2_Category"),
             RiskLevel = RiskLevel.Safe,
-            StatusText = $"合规地区：{exitIp.CountryCode} · {exitIp.Ip}",
-            ShortStatus = $"{exitIp.CountryCode} · 合规",
-            Detail = $"位置：{exitIp.DisplayLocation}（数据源：{exitIp.Source}，探测耗时 {exitIp.LatencyMs} ms）。",
-            Recommendation = "当前出口地区在 Anthropic 服务支持范围内。"
+            StatusText = L.Format("Chk2_Safe_Status", exitIp.CountryCode, exitIp.Ip),
+            ShortStatus = L.Format("Chk2_Safe_Short", exitIp.CountryCode),
+            Detail = L.Format("Chk2_Safe_Detail", exitIp.DisplayLocation, exitIp.Source, exitIp.LatencyMs),
+            Recommendation = L.Get("Chk2_Safe_Rec")
         };
     }
 
@@ -290,14 +293,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "ip_purity",
-                Title = "3. IP 属性与机房纯净度评估",
-                ShortTitle = "IP 纯净度",
-                Category = "IP 质量",
+                Title = L.Get("Chk3_Title"),
+                ShortTitle = L.Get("Chk3_ShortTitle"),
+                Category = L.Get("Chk3_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = "未获取到 ASN 信息",
-                ShortStatus = "未获取",
-                Detail = "依赖出口 IP 检测结果。",
-                Recommendation = "请先解决代理连通与出口探测问题。"
+                StatusText = L.Get("Chk3_NoAsn_Status"),
+                ShortStatus = L.Get("Chk3_NoAsn_Short"),
+                Detail = L.Get("Chk3_NoAsn_Detail"),
+                Recommendation = L.Get("Chk3_NoAsn_Rec")
             };
         }
 
@@ -308,34 +311,34 @@ public sealed class NetworkCheckService
         if (exitIp.IsHosting || exitIp.IsProxy || matchedKeyword != null)
         {
             var reason = matchedKeyword != null
-                ? $"命中机房/云厂商特征 ({matchedKeyword})"
-                : exitIp.IsHosting ? "GeoIP 标记为 Hosting/IDC 数据中心" : "GeoIP 标记为公共代理节点";
+                ? L.Format("Chk3_ReasonKeyword", matchedKeyword)
+                : exitIp.IsHosting ? L.Get("Chk3_ReasonHosting") : L.Get("Chk3_ReasonProxy");
 
             return new CheckItemResult
             {
                 Id = "ip_purity",
-                Title = "3. IP 属性与机房纯净度评估",
-                ShortTitle = "IP 纯净度",
-                Category = "IP 质量",
+                Title = L.Get("Chk3_Title"),
+                ShortTitle = L.Get("Chk3_ShortTitle"),
+                Category = L.Get("Chk3_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = "机房 / 共享节点 IP（中等风控权重）",
-                ShortStatus = "机房节点",
-                Detail = $"{reason}。ISP：{exitIp.Isp} | ASN：{exitIp.Asn}。",
-                Recommendation = "机场或普通 VPS 机房 IP 属于共享出口，切勿在会话期间频繁切换节点；如有条件建议使用独享静态住宅 IP。"
+                StatusText = L.Get("Chk3_Dc_Status"),
+                ShortStatus = L.Get("Chk3_Dc_Short"),
+                Detail = L.Format("Chk3_Dc_Detail", reason, exitIp.Isp, exitIp.Asn),
+                Recommendation = L.Get("Chk3_Dc_Rec")
             };
         }
 
         return new CheckItemResult
         {
             Id = "ip_purity",
-            Title = "3. IP 属性与机房纯净度评估",
-            ShortTitle = "IP 纯净度",
-            Category = "IP 质量",
+            Title = L.Get("Chk3_Title"),
+            ShortTitle = L.Get("Chk3_ShortTitle"),
+            Category = L.Get("Chk3_Category"),
             RiskLevel = RiskLevel.Safe,
-            StatusText = "非数据中心 / 较纯净 ISP",
-            ShortStatus = "较纯净 ISP",
-            Detail = $"ISP：{exitIp.Isp} | Org：{exitIp.Org} | ASN：{exitIp.Asn}。",
-            Recommendation = "当前 IP 未触发常见机房黑名单特征，风控风险较低。"
+            StatusText = L.Get("Chk3_Safe_Status"),
+            ShortStatus = L.Get("Chk3_Safe_Short"),
+            Detail = L.Format("Chk3_Safe_Detail", exitIp.Isp, exitIp.Org, exitIp.Asn),
+            Recommendation = L.Get("Chk3_Safe_Rec")
         };
     }
 
@@ -349,14 +352,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "ip_drift",
-                Title = "4. 历史 IP 漂移防风控对比",
-                ShortTitle = "IP 防漂移",
-                Category = "防漂移",
+                Title = L.Get("Chk4_Title"),
+                ShortTitle = L.Get("Chk4_ShortTitle"),
+                Category = L.Get("Chk4_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = "暂无法比对",
-                ShortStatus = "无法比对",
-                Detail = "未能获取到本次出口 IP。",
-                Recommendation = "等待出口探测成功后进行比对。"
+                StatusText = L.Get("Chk4_NoData_Status"),
+                ShortStatus = L.Get("Chk4_NoData_Short"),
+                Detail = L.Get("Chk4_NoData_Detail"),
+                Recommendation = L.Get("Chk4_NoData_Rec")
             };
         }
 
@@ -365,14 +368,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "ip_drift",
-                Title = "4. 历史 IP 漂移防风控对比",
-                ShortTitle = "IP 防漂移",
-                Category = "防漂移",
+                Title = L.Get("Chk4_Title"),
+                ShortTitle = L.Get("Chk4_ShortTitle"),
+                Category = L.Get("Chk4_Category"),
                 RiskLevel = RiskLevel.Safe,
-                StatusText = "首次记录基线 IP",
-                ShortStatus = "首次基线",
-                Detail = $"暂无历史会话记录。本次安全启动后将把 {exitIp.Ip} ({exitIp.CountryCode}) 设为后续漂移基线。",
-                Recommendation = "建议后续尽量固定同一地区与节点登录 Claude。"
+                StatusText = L.Get("Chk4_First_Status"),
+                ShortStatus = L.Get("Chk4_First_Short"),
+                Detail = L.Format("Chk4_First_Detail", exitIp.Ip, exitIp.CountryCode),
+                Recommendation = L.Get("Chk4_First_Rec")
             };
         }
 
@@ -381,14 +384,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "ip_drift",
-                Title = "4. 历史 IP 漂移防风控对比",
-                ShortTitle = "IP 防漂移",
-                Category = "防漂移",
+                Title = L.Get("Chk4_Title"),
+                ShortTitle = L.Get("Chk4_ShortTitle"),
+                Category = L.Get("Chk4_Category"),
                 RiskLevel = RiskLevel.Safe,
-                StatusText = "与上次安全 IP 完全一致",
-                ShortStatus = "与上次一致",
-                Detail = $"本次出口 {exitIp.Ip} ({exitIp.CountryCode}) 与上次启动（{lastSafe.RecordedAt:MM-dd HH:mm}）完全相同。",
-                Recommendation = "IP 稳定性极佳，账号风控概率最低。"
+                StatusText = L.Get("Chk4_Exact_Status"),
+                ShortStatus = L.Get("Chk4_Exact_Short"),
+                Detail = L.Format("Chk4_Exact_Detail", exitIp.Ip, exitIp.CountryCode, lastSafe.RecordedAt),
+                Recommendation = L.Get("Chk4_Exact_Rec")
             };
         }
 
@@ -397,28 +400,29 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "ip_drift",
-                Title = "4. 历史 IP 漂移防风控对比",
-                ShortTitle = "IP 防漂移",
-                Category = "防漂移",
+                Title = L.Get("Chk4_Title"),
+                ShortTitle = L.Get("Chk4_ShortTitle"),
+                Category = L.Get("Chk4_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = $"⚠️ 跨国 IP 瞬移：{lastSafe.CountryCode} → {exitIp.CountryCode}",
-                ShortStatus = $"{lastSafe.CountryCode}→{exitIp.CountryCode} 跨国",
-                Detail = $"上次安全 IP 为 {lastSafe.Ip} ({lastSafe.Country} · {lastSafe.RecordedAt:MM-dd HH:mm})，当前变为 {exitIp.Ip} ({exitIp.Country})。短时间跨国跳变极易触发风控！",
-                Recommendation = "强烈建议切回原国家节点；若原节点已永久失效且必须更换国家，请确认间隔时间足够长再点击启动。"
+                IsCrossCountryDrift = true,
+                StatusText = L.Format("Chk4_Cross_Status", lastSafe.CountryCode, exitIp.CountryCode),
+                ShortStatus = L.Format("Chk4_Cross_Short", lastSafe.CountryCode, exitIp.CountryCode),
+                Detail = L.Format("Chk4_Cross_Detail", lastSafe.Ip, lastSafe.Country, lastSafe.RecordedAt, exitIp.Ip, exitIp.Country),
+                Recommendation = L.Get("Chk4_Cross_Rec")
             };
         }
 
         return new CheckItemResult
         {
             Id = "ip_drift",
-            Title = "4. 历史 IP 漂移防风控对比",
-            ShortTitle = "IP 防漂移",
-            Category = "防漂移",
+            Title = L.Get("Chk4_Title"),
+            ShortTitle = L.Get("Chk4_ShortTitle"),
+            Category = L.Get("Chk4_Category"),
             RiskLevel = RiskLevel.Warning,
-            StatusText = $"同国 IP 变更 ({exitIp.CountryCode})",
-            ShortStatus = "同国 IP 变更",
-            Detail = $"上次 IP：{lastSafe.Ip} ({lastSafe.Asn}) → 当前 IP：{exitIp.Ip} ({exitIp.Asn})，国家保持一致。",
-            Recommendation = "同国家内更换 IP 风险可控，但仍建议在代理软件中固定具体节点而非使用自动测速/负载均衡。"
+            StatusText = L.Format("Chk4_SameCountry_Status", exitIp.CountryCode),
+            ShortStatus = L.Get("Chk4_SameCountry_Short"),
+            Detail = L.Format("Chk4_SameCountry_Detail", lastSafe.Ip, lastSafe.Asn, exitIp.Ip, exitIp.Asn),
+            Recommendation = L.Get("Chk4_SameCountry_Rec")
         };
     }
 
@@ -433,14 +437,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "anthropic_conn",
-                Title = "5. Anthropic 连通性与防泄漏验证",
-                ShortTitle = "分流防漏",
-                Category = "分流防漏",
+                Title = L.Get("Chk5_Title"),
+                ShortTitle = L.Get("Chk5_ShortTitle"),
+                Category = L.Get("Chk5_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = "无法验证（代理未连接）",
-                ShortStatus = "未验证",
-                Detail = "未发现可用代理端口。",
-                Recommendation = "请开启本地代理后重新检测。"
+                StatusText = L.Get("Chk5_NoProxy_Status"),
+                ShortStatus = L.Get("Chk5_NoProxy_Short"),
+                Detail = L.Get("Chk5_NoProxy_Detail"),
+                Recommendation = L.Get("Chk5_NoProxy_Rec")
             };
         }
 
@@ -449,14 +453,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "anthropic_conn",
-                Title = "5. Anthropic 连通性与防泄漏验证",
-                ShortTitle = "分流防漏",
-                Category = "分流防漏",
+                Title = L.Get("Chk5_Title"),
+                ShortTitle = L.Get("Chk5_ShortTitle"),
+                Category = L.Get("Chk5_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = "无法连接 claude.ai",
-                ShortStatus = "连接失败",
-                Detail = "通过当前代理访问 https://claude.ai/cdn-cgi/trace 失败或超时，可能节点被 Cloudflare 阻断或网络不通。",
-                Recommendation = "请更换支持 Claude 访问的代理节点并重试。"
+                StatusText = L.Get("Chk5_Unreachable_Status"),
+                ShortStatus = L.Get("Chk5_Unreachable_Short"),
+                Detail = L.Get("Chk5_Unreachable_Detail"),
+                Recommendation = L.Get("Chk5_Unreachable_Rec")
             };
         }
 
@@ -465,14 +469,14 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "anthropic_conn",
-                Title = "5. Anthropic 连通性与防泄漏验证",
-                ShortTitle = "分流防漏",
-                Category = "分流防漏",
+                Title = L.Get("Chk5_Title"),
+                ShortTitle = L.Get("Chk5_ShortTitle"),
+                Category = L.Get("Chk5_Category"),
                 RiskLevel = RiskLevel.Danger,
-                StatusText = $"分流泄漏警告：Claude 侧识别为 {anthropicTraceCountry}",
-                ShortStatus = $"泄漏 ({anthropicTraceCountry})",
-                Detail = $"虽然 GeoIP 查询正常，但通过代理实际抵达 claude.ai 的出口国家代码为 {anthropicTraceCountry}（受限地区），存在严重的分流规则泄漏！",
-                Recommendation = "请检查 Clash/代理分流规则，确保 *.anthropic.com 和 *.claude.ai 全部走海外代理而不是 DIRECT。"
+                StatusText = L.Format("Chk5_Leak_Status", anthropicTraceCountry),
+                ShortStatus = L.Format("Chk5_Leak_Short", anthropicTraceCountry),
+                Detail = L.Format("Chk5_Leak_Detail", anthropicTraceCountry),
+                Recommendation = L.Get("Chk5_Leak_Rec")
             };
         }
 
@@ -483,32 +487,32 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "anthropic_conn",
-                Title = "5. Anthropic 连通性与防泄漏验证",
-                ShortTitle = "分流防漏",
-                Category = "分流防漏",
+                Title = L.Get("Chk5_Title"),
+                ShortTitle = L.Get("Chk5_ShortTitle"),
+                Category = L.Get("Chk5_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = $"分流节点不一致 ({exitIp.CountryCode} vs {anthropicTraceCountry})",
-                ShortStatus = $"{exitIp.CountryCode}/{anthropicTraceCountry} 混用",
-                Detail = $"GeoIP 出口为 {exitIp.CountryCode}，但 claude.ai 落地国家为 {anthropicTraceCountry}，说明代理软件可能对 Anthropic 走了不同策略组。",
-                Recommendation = "建议在代理规则中将 Anthropic / Claude 域名与 IP 检测站点归入同一策略组。"
+                StatusText = L.Format("Chk5_Mismatch_Status", exitIp.CountryCode, anthropicTraceCountry),
+                ShortStatus = L.Format("Chk5_Mismatch_Short", exitIp.CountryCode, anthropicTraceCountry),
+                Detail = L.Format("Chk5_Mismatch_Detail", exitIp.CountryCode, anthropicTraceCountry),
+                Recommendation = L.Get("Chk5_Mismatch_Rec")
             };
         }
 
         return new CheckItemResult
         {
             Id = "anthropic_conn",
-            Title = "5. Anthropic 连通性与防泄漏验证",
-            ShortTitle = "分流防漏",
-            Category = "分流防漏",
+            Title = L.Get("Chk5_Title"),
+            ShortTitle = L.Get("Chk5_ShortTitle"),
+            Category = L.Get("Chk5_Category"),
             RiskLevel = RiskLevel.Safe,
             StatusText = string.IsNullOrWhiteSpace(anthropicTraceCountry)
-                ? "claude.ai TLS 连通正常"
-                : $"claude.ai 连通正常 (落地 {anthropicTraceCountry})",
+                ? L.Get("Chk5_SafeTls_Status")
+                : L.Format("Chk5_SafeCountry_Status", anthropicTraceCountry),
             ShortStatus = string.IsNullOrWhiteSpace(anthropicTraceCountry)
-                ? "TLS 畅通"
-                : $"畅通 ({anthropicTraceCountry})",
-            Detail = "经本地代理转发访问 Anthropic 域名链路畅通，未发现直连/DNS 泄漏。",
-            Recommendation = "运行期间守门代理将持续锁死该路由。"
+                ? L.Get("Chk5_SafeTls_Short")
+                : L.Format("Chk5_SafeCountry_Short", anthropicTraceCountry),
+            Detail = L.Get("Chk5_Safe_Detail"),
+            Recommendation = L.Get("Chk5_Safe_Rec")
         };
     }
 
@@ -516,18 +520,18 @@ public sealed class NetworkCheckService
     {
         if (proxyProbe.RunningAccelerators is { Count: > 0 })
         {
-            var names = string.Join("、", proxyProbe.RunningAccelerators);
+            var names = string.Join(L.Get("Chk6_Separator"), proxyProbe.RunningAccelerators);
             return new CheckItemResult
             {
                 Id = "sys_env",
-                Title = "6. 加速器冲突与环境检测",
-                ShortTitle = "加速/环境",
-                Category = "冲突与环境",
+                Title = L.Get("Chk6_Title"),
+                ShortTitle = L.Get("Chk6_ShortTitle"),
+                Category = L.Get("Chk6_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = $"检测到游戏加速器运行中：{names}",
-                ShortStatus = "加速器运行中",
-                Detail = $"后台检测到 {names} 进程或虚拟网卡。即便当前未开启加速，也请留意路由冲突；若正在加速游戏，其驱动极易将流量劫持至香港(HK)或国内中转节点导致触发 Claude 封禁！",
-                Recommendation = "建议在使用 Claude 前关闭游戏加速器（或确认已停止加速并开启代理 TUN 模式），核对上方 Claude 出口 IP 无误后再启动。"
+                StatusText = L.Format("Chk6_Booster_Status", names),
+                ShortStatus = L.Get("Chk6_Booster_Short"),
+                Detail = L.Format("Chk6_Booster_Detail", names),
+                Recommendation = L.Get("Chk6_Booster_Rec")
             };
         }
 
@@ -539,28 +543,28 @@ public sealed class NetworkCheckService
             return new CheckItemResult
             {
                 Id = "sys_env",
-                Title = "6. 加速器冲突与环境检测",
-                ShortTitle = "加速/环境",
-                Category = "冲突与环境",
+                Title = L.Get("Chk6_Title"),
+                ShortTitle = L.Get("Chk6_ShortTitle"),
+                Category = L.Get("Chk6_Category"),
                 RiskLevel = RiskLevel.Warning,
-                StatusText = $"时区偏差：系统 UTC+8 vs 出口 {exitIp.CountryCode}",
-                ShortStatus = "UTC+8 偏差",
-                Detail = $"未检测到常见游戏加速器。本机系统时区为 {tz.DisplayName}，与当前代理出口国家（{exitIp.CountryCode}）时区不一致。",
-                Recommendation = "桌面端一般仅作辅助风险提示；若使用网页端或新注册账号，建议同步系统时区或选择亚洲节点。"
+                StatusText = L.Format("Chk6_Tz_Status", exitIp.CountryCode),
+                ShortStatus = L.Get("Chk6_Tz_Short"),
+                Detail = L.Format("Chk6_Tz_Detail", tz.DisplayName, exitIp.CountryCode),
+                Recommendation = L.Get("Chk6_Tz_Rec")
             };
         }
 
         return new CheckItemResult
         {
             Id = "sys_env",
-            Title = "6. 加速器冲突与环境检测",
-            ShortTitle = "加速/环境",
-            Category = "冲突与环境",
+            Title = L.Get("Chk6_Title"),
+            ShortTitle = L.Get("Chk6_ShortTitle"),
+            Category = L.Get("Chk6_Category"),
             RiskLevel = RiskLevel.Safe,
-            StatusText = $"无加速器冲突 · 环境正常 ({tz.Id})",
-            ShortStatus = "无冲突",
-            Detail = $"未检测到常见游戏加速器运行。本机当前时区：{tz.DisplayName}。",
-            Recommendation = "系统基础环境与路由环境检查通过。"
+            StatusText = L.Format("Chk6_Safe_Status", tz.Id),
+            ShortStatus = L.Get("Chk6_Safe_Short"),
+            Detail = L.Format("Chk6_Safe_Detail", tz.DisplayName),
+            Recommendation = L.Get("Chk6_Safe_Rec")
         };
     }
 

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using ClaudeSafe.Localization;
 using ClaudeSafe.Models;
 using Microsoft.Win32;
 
@@ -54,6 +55,7 @@ public sealed class ConfigService
                 if (string.IsNullOrWhiteSpace(config.UpstreamProxyHost)) config.UpstreamProxyHost = "127.0.0.1";
                 if (config.GatekeeperPort <= 0) config.GatekeeperPort = 17890;
                 if (config.CooldownDurationSeconds <= 0) config.CooldownDurationSeconds = 300;
+                config.Language = L.NormalizeSetting(config.Language);
                 config.IpHistory ??= new();
                 return config;
             }
@@ -131,7 +133,7 @@ public sealed class ConfigService
         {
             using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", writable: true);
             if (key == null)
-                return (false, "无法打开开机启动注册表键");
+                return (false, L.Get("Cfg_RegOpenFail"));
 
             if (enable)
             {
@@ -144,20 +146,20 @@ public sealed class ConfigService
                 }
 
                 if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
-                    return (false, "未找到可执行文件路径");
+                    return (false, L.Get("Cfg_ExeNotFound"));
 
                 key.SetValue("ClaudeSafe", $"\"{exePath}\" --minimized", RegistryValueKind.String);
-                return (true, "已开启开机自启动（静默驻留系统托盘守护）");
+                return (true, L.Get("Cfg_StartupEnabled"));
             }
             else
             {
                 key.DeleteValue("ClaudeSafe", throwOnMissingValue: false);
-                return (true, "已关闭开机自启动");
+                return (true, L.Get("Cfg_StartupDisabled"));
             }
         }
         catch (Exception ex)
         {
-            return (false, $"设置开机自启动失败: {ex.Message}");
+            return (false, L.Format("Cfg_StartupError", ex.Message));
         }
     }
 
